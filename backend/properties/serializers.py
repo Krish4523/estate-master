@@ -5,7 +5,7 @@ from .models import Property, PropertyImage
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyImage
-        fields = ['id', 'image']
+        fields = ["id", "image"]
 
 
 class PropertySerializer(serializers.ModelSerializer):
@@ -26,26 +26,28 @@ class PropertySerializer(serializers.ModelSerializer):
             "bedrooms",
             "parking",
             "listed_date",
-            "is_available",
+            "is_verified",
+            "is_sold",
             "seller",
             "agent",
             "images",
         ]
 
     def create(self, validated_data):
-        images_data = validated_data.pop('images', None)
+        # images_data = validated_data.pop("images", None)
         property_instance = Property.objects.create(**validated_data)
-
+        print(validated_data)
         # Handle images
-        if images_data:
-            for image_data in images_data[:4]:
-                PropertyImage.objects.create(property=property_instance, **image_data)
+        # if images_data:
+        #     print(images_data)
+        #     for image_data in images_data[:4]:
+        #         PropertyImage.objects.create(property=property_instance, **image_data)
 
         return property_instance
 
     def update(self, instance, validated_data):
         # Extract images data from validated_data if present
-        images_data = validated_data.pop('images', None)
+        images_data = validated_data.pop("images", None)
 
         # Update property instance fields
         for attr, value in validated_data.items():

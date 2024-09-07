@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -19,14 +20,18 @@ import {
   SelectValue,
 } from "@/components/ui/select.jsx";
 import { PropertySchema } from "@/utils/schemas.js";
+import { useAuth } from "@/contexts/AuthContext.jsx";
 
-function AddProperty () {
+function AddProperty() {
+  const { authToken, user } = useAuth();
+  const [agents, setAgents] = useState([]);
+
   const form = useForm({
     resolver: zodResolver(PropertySchema),
     defaultValues: {
       title: "",
       description: "",
-      property_type: "residential",
+      property_type: "",
       price: "",
       local_address: "",
       city: "",
@@ -35,37 +40,55 @@ function AddProperty () {
       sqft: "",
       bedrooms: "",
       parking: "",
+      agent: "",
       images: [],
     },
   });
 
-  const onSubmit = async (data) => {
-    data.is_available = true;
-    data.seller = 1;
-    data.agent = 1;
-
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(data)) {
-      if (key === "images") {
-        value.forEach((file) => formData.append("images", file));
-      } else {
-        formData.append(key, value);
+  // Fetch agents from API
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/agents/`,
+          {
+            headers: {
+              Authorization: `Token ${authToken}`,
+            },
+          }
+        );
+        setAgents(response.data);
+      } catch (error) {
+        console.error("Error fetching agents:", error);
       }
-    }
+    };
+    fetchAgents();
+  }, [authToken]);
+
+  const onSubmit = async (data) => {
+    data.is_varified = false;
+    data.is_sold = false;
+    data.seller = user.id;
     console.log(data);
-    console.log(formData);
     try {
       const response = await axios.post(
-        "http://localhost:8000/property/save/",
-        formData,
+        `${import.meta.env.VITE_API_BASE_URL}/property/save/`,
+        data,
+        {
+          headers: {
+            Authorization: `Token ${authToken}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
-      const responseMsg =
-        response.data.message === "successful"
-          ? "Property Registered Successfully"
-          : "Property Already Exists";
-      document.getElementById("op").innerText = responseMsg;
-      document.getElementById("op").style.color =
-        response.data.message === "successful" ? "green" : "red";
+      console.log(response);
+      // const responseMsg =
+      //   response.data.message === "successful"
+      //     ? "Property Registered Successfully"
+      //     : "Property Already Exists";
+      // document.getElementById("op").innerText = responseMsg;
+      // document.getElementById("op").style.color =
+      //   response.data.message === "successful" ? "green" : "red";
     } catch (error) {
       console.error(error);
     }
@@ -76,6 +99,7 @@ function AddProperty () {
       <h1 className="text-2xl font-bold mb-4">Add Property</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Title Field */}
           <FormField
             control={form.control}
             name="title"
@@ -88,6 +112,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* Description Field */}
           <FormField
             control={form.control}
             name="description"
@@ -100,6 +126,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* Property Type */}
           <FormField
             control={form.control}
             name="property_type"
@@ -121,6 +149,42 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* Agent Selection */}
+          <FormField
+            control={form.control}
+            name="agent"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Select
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={field.value ? String(field.value) : ""}
+                  >
+                    <SelectTrigger>
+                      {/* Display the agent's name */}
+                      <SelectValue placeholder="Select Agent">
+                        {field.value
+                          ? agents.find((agent) => agent.id === field.value)
+                              ?.name
+                          : "Select Agent"}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {agents.map((agent) => (
+                        <SelectItem key={agent.id} value={String(agent.id)}>
+                          {agent.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Price Field */}
           <FormField
             control={form.control}
             name="price"
@@ -137,6 +201,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* Local Address Field */}
           <FormField
             control={form.control}
             name="local_address"
@@ -149,6 +215,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* City Field */}
           <FormField
             control={form.control}
             name="city"
@@ -161,6 +229,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* State Field */}
           <FormField
             control={form.control}
             name="state"
@@ -173,6 +243,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* Pincode Field */}
           <FormField
             control={form.control}
             name="pincode"
@@ -185,6 +257,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* Square Feet Field */}
           <FormField
             control={form.control}
             name="sqft"
@@ -197,6 +271,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* Bedrooms Field */}
           <FormField
             control={form.control}
             name="bedrooms"
@@ -209,6 +285,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* Parking Field */}
           <FormField
             control={form.control}
             name="parking"
@@ -225,6 +303,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* Image Upload */}
           <FormField
             control={form.control}
             name="images"
@@ -245,6 +325,8 @@ function AddProperty () {
               </FormItem>
             )}
           />
+
+          {/* Submit Button */}
           <Button type="submit" className="w-full">
             Submit
           </Button>

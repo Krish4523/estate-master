@@ -72,7 +72,11 @@ def login_user(request):
     if user.is_active:
         token, _ = Token.objects.get_or_create(user=user)
         return Response(
-            {"token": token.key, "user": UserSerializer(user).data, "message": "Login Successful"},
+            {
+                "token": token.key,
+                "user": UserSerializer(user).data,
+                "message": "Login Successful",
+            },
             status=status.HTTP_200_OK,
         )
     else:
@@ -88,7 +92,7 @@ def login_user(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+@authentication_classes([TokenAuthentication])
 def get_user(request):
     user = request.user
     serializer = UserSerializer(user)
@@ -97,7 +101,7 @@ def get_user(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
+@authentication_classes([TokenAuthentication])
 def logout(request):
     if request.user.is_authenticated:
         try:
@@ -108,7 +112,9 @@ def logout(request):
             response = Response(
                 {"message": "Successfully logged out"}, status=status.HTTP_200_OK
             )
-            response.delete_cookie("token")  # Optionally delete any related cookies if used
+            response.delete_cookie(
+                "token"
+            )  # Optionally delete any related cookies if used
             return response
         except Token.DoesNotExist:
             return Response(

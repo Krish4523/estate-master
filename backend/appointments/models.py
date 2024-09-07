@@ -5,8 +5,12 @@ from properties.models import Property
 
 # Appointment Model
 class Appointment(models.Model):
-    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='appointments')
-    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='appointments')
+    property = models.ForeignKey(
+        Property, on_delete=models.CASCADE, related_name="appointments"
+    )
+    buyer = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="appointments"
+    )
     date = models.DateTimeField()
     confirmed = models.BooleanField(default=False)
 

@@ -60,8 +60,6 @@ export const PropertySchema = z.object({
   sqft: z.coerce.number().positive("Area must be a positive number"),
   bedrooms: z.coerce.number().min(1, "At least one bedroom is required"),
   parking: z.coerce.number().min(0, "Parking spaces cannot be negative"),
-  images: z
-    .array(z.instanceof(File))
-    .max(4, "You can only upload up to 4 images")
-    .optional(),
+  images: z.array(z.instanceof(File)).min(4, "Please upload at least 4 images"),
+  agent: z.coerce.number().positive("Please select an agent"),
 });

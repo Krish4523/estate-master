@@ -2,3 +2,5 @@
 .venv
 
 .env
+media/*
+media/property_images/

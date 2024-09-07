@@ -72,7 +72,7 @@ def login_user(request):
     if user.is_active:
         token, _ = Token.objects.get_or_create(user=user)
         return Response(
-            {"token": token.key, "user": UserSerializer(user).data},
+            {"token": token.key, "user": UserSerializer(user).data, "message": "Login Successful"},
             status=status.HTTP_200_OK,
         )
     else:

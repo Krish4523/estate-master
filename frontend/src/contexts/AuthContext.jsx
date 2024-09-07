@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { submitForm } from "@/utils/submitForm.js";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext(null);
 
@@ -64,10 +65,12 @@ export const AuthProvider = ({ children }) => {
       setLoading,
       setErrorMessage,
       onSuccess: (response) => {
+        console.log(response);
         localStorage.setItem("authToken", response.token);
         setAuthToken(response.token);
         setIsAuthenticated(true);
         navigate("/");
+        toast.success(response.message);
       },
       onError: (error) => {
         if (error.response?.data?.message?.includes("Account is inactive")) {
@@ -86,7 +89,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post(
+      const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/auth/logout/`,
         {},
         {
@@ -100,6 +103,7 @@ export const AuthProvider = ({ children }) => {
       setAuthToken(null);
       setIsAuthenticated(false);
       navigate("/login");
+      toast.success(response.data.message);
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -111,10 +115,11 @@ export const AuthProvider = ({ children }) => {
       endpoint: `${import.meta.env.VITE_API_BASE_URL}/auth/register/`,
       setLoading,
       setErrorMessage,
-      onSuccess: () => {
+      onSuccess: (response) => {
         setAuthToken(null);
         setIsAuthenticated(false);
         navigate("/verify", { state: { email: data?.email } });
+        toast.success(response.message);
       },
       onError: (error) => {
         console.error("Signup failed:", error);
@@ -134,6 +139,7 @@ export const AuthProvider = ({ children }) => {
       setAuthToken(response.data.token);
       setIsAuthenticated(true);
       navigate("/");
+      toast.success(response.data.message);
     } catch (error) {
       setErrorMessage("Invalid or expired OTP. Please try again.");
     } finally {
@@ -144,11 +150,12 @@ export const AuthProvider = ({ children }) => {
   const resendOtp = async (email) => {
     setLoading(true);
     try {
-      await axios.post(
+      const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/auth/resend-otp/`,
         { email }
       );
       setErrorMessage(null);
+      toast.success(response.data.message);
     } catch (error) {
       setErrorMessage("Failed to resend OTP. Please try again.");
     } finally {

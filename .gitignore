@@ -1,3 +1,8 @@
-.idea
+./.idea/*
+./idea/codeStyles
 
-.env
+backend/.env
+backend/.venv
+
+frontend/.env
+frontend/node_modules

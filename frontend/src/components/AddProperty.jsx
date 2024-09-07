@@ -1,145 +1,3 @@
-/*
-import React, { useState } from "react";
-import axios from "axios";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-
-function AddProperty() {
-  const [data, setData] = useState({});
-
-  const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    data["is_available"] = true;
-    data["seller"] = 1;
-    data["agent"] = 1;
-    let responseMsg = "";
-    axios
-      .post("http://localhost:8000/property/save/", data)
-      .then((response) => {
-        if (response.data.message === "successful") {
-          document.getElementById("op").style.color = "green";
-          responseMsg = "Property Registered Successfully";
-        } else {
-          document.getElementById("op").style.color = "red";
-          responseMsg = "Property Already Exists";
-        }
-        document.getElementById("op").innerText = responseMsg;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  return (
-    <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
-      <h1 className="text-2xl font-bold mb-6">Add Property</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-          type="text"
-          name="title"
-          value={data.title || ""}
-          placeholder="Enter Title"
-          onChange={handleChange}
-        />
-        <Textarea
-          name="description"
-          value={data.description || ""}
-          placeholder="Description"
-          onChange={handleChange}
-        />
-        <Select
-          name="property_type"
-          value={data.property_type}
-          onValueChange={(value) =>
-            handleChange({ target: { name: "property_type", value } })
-          }
-        >
-          <SelectTrigger className="w-full">Type</SelectTrigger>
-          <SelectContent>
-            <SelectItem value="residential">Residential</SelectItem>
-            <SelectItem value="commercial">Commercial</SelectItem>
-            <SelectItem value="industrial">Industrial</SelectItem>
-          </SelectContent>
-        </Select>
-        <Input
-          type="number"
-          name="price"
-          value={data.price || ""}
-          placeholder="Enter Your Price"
-          onChange={handleChange}
-        />
-        <Input
-          type="text"
-          name="local_address"
-          value={data.local_address || ""}
-          placeholder="Local Address"
-          onChange={handleChange}
-        />
-        <Input
-          type="text"
-          name="city"
-          value={data.city || ""}
-          placeholder="City"
-          onChange={handleChange}
-        />
-        <Input
-          type="text"
-          name="state"
-          value={data.state || ""}
-          placeholder="State"
-          onChange={handleChange}
-        />
-        <Input
-          type="number"
-          name="pincode"
-          value={data.pincode || ""}
-          placeholder="PIN"
-          onChange={handleChange}
-        />
-        <Input
-          type="number"
-          name="sqft"
-          value={data.sqft || ""}
-          placeholder="Area (sqft)"
-          onChange={handleChange}
-        />
-        <Input
-          type="number"
-          name="bedrooms"
-          value={data.bedrooms || ""}
-          placeholder="Bedrooms"
-          onChange={handleChange}
-        />
-        <Input
-          type="number"
-          name="parking"
-          value={data.parking || ""}
-          placeholder="Parking"
-          onChange={handleChange}
-        />
-        <Button type="submit" className="w-full">
-          Submit
-        </Button>
-      </form>
-      <h2 id="op" className="text-center mt-4"></h2>
-    </div>
-  );
-}
-
-export default AddProperty;
-*/
-import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -162,7 +20,7 @@ import {
 } from "@/components/ui/select.jsx";
 import { PropertySchema } from "@/utils/schemas.js";
 
-function AddProperty() {
+function AddProperty () {
   const form = useForm({
     resolver: zodResolver(PropertySchema),
     defaultValues: {
@@ -199,7 +57,7 @@ function AddProperty() {
     try {
       const response = await axios.post(
         "http://localhost:8000/property/save/",
-        formData
+        formData,
       );
       const responseMsg =
         response.data.message === "successful"

@@ -122,15 +122,14 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractUser):
     ROLE_CHOICES = [
-        ('buyer', 'Buyer'),
-        ('seller', 'Seller'),
+        ('customer', 'Customer'),
         ('agent', 'Agent'),
     ]
 
     name = models.CharField(max_length=255, default="")
     email = models.EmailField(max_length=255, unique=True)
     phone = models.CharField(max_length=10, unique=True, default="")
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='buyer', blank=False, null=False)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='customer', blank=False, null=False)
 
     # Allow `username` to be optional, but it will be auto-set for regular users
     username = models.CharField(max_length=150, unique=True, blank=True, null=True)
@@ -139,7 +138,7 @@ class User(AbstractUser):
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_set', blank=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'phone', 'role']  # Remove 'password' from REQUIRED_FIELDS
+    REQUIRED_FIELDS = ['name', 'phone', 'role']
 
     objects = CustomUserManager()
 

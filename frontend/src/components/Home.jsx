@@ -123,7 +123,7 @@ function Home() {
           </p>
         </div>
         <Separator />
-        <div className="flex flex-col gap-4 md:flex-row justify-between items-start space-y-8 md:space-y-0">
+        <div className="flex flex-col gap-4 md:flex-row justify-around items-start space-y-8 md:space-y-0">
           <div className="flex-1 space-y-4">
             <h2 className="text-xl font-bold">PPortal</h2>
             <p className="text-sm text-gray-600">

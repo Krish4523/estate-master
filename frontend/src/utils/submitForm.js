@@ -31,8 +31,9 @@ export async function submitForm({
 
     // Call the onSuccess callback if provided
     if (onSuccess) {
+      console.log("successfully submitted");
       onSuccess(response.data);
-    } 
+    }
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // Handle Axios error

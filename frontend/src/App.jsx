@@ -8,10 +8,17 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Home from "@/components/Home.jsx";
 import Listing from "@/components/Listing.jsx";
 import AddProperty from "@/components/AddProperty.jsx";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <Router>
+      <Toaster
+        position="bottom-right"
+        reverseOrder={true}
+        toastOptions={{ duration: 3000 }}
+        containerStyle={{ zIndex: 99 }}
+      />
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />

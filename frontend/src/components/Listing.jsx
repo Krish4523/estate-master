@@ -18,8 +18,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.jsx";
+import { useAuth } from "@/contexts/AuthContext.jsx";
 
 function Listing() {
+  const { authToken } = useAuth();
   const [filter, setFilter] = useState({
     bed: "all",
     price: "all",
@@ -30,15 +32,25 @@ function Listing() {
   const [homes, setHomes] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/property/details")
-      .then((result) => {
-        setHomes(result.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+    const fetchListings = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/property/list`,
+          {
+            headers: {
+              Authorization: `Token ${authToken}`,
+            },
+          }
+        );
+        setHomes(response.data);
+        console.log(response.data);
+      } catch (err) {
+        console.error("Error fetching listings:", err);
+      }
+    };
+
+    fetchListings();
+  }, [authToken]);
 
   const handleFilterChange = (e) => {
     setFilter({ ...filter, [e.target.name]: e.target.value });
@@ -195,31 +207,34 @@ function Listing() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
           {filteredHomes.map((home) => (
             <Link to={`/property?id=${home.id}`} key={home.id}>
-              <Card className="transition-transform transform hover:scale-105">
-                <CardHeader>
+              <Card className="transition-transform transform hover:shadow-lg">
+                <CardHeader className="p-2">
                   <img
-                    src={i1}
+                    src={`${import.meta.env.VITE_API_BASE_URL}/${home.images[0]?.image}`}
                     alt="Home"
                     className="w-full h-40 object-cover rounded-t-md"
                   />
                 </CardHeader>
-                <CardContent>
-                  <CardTitle className="text-lg font-semibold">
-                    $ {home.price}
+                <CardContent className="px-4 py-2">
+                  <CardTitle className="flex justify-between flex-wrap gap-2 text-lg font-semibold">
+                    <span>{home.title}</span>
+                    <span>${home.price}</span>
                   </CardTitle>
                   <CardDescription className="flex items-center text-sm mt-2">
-                    <MapPin size={16} className="mr-2" /> {home.local_address}
+                    <MapPin size={16} className="mr-1" /> {home.city}
+                    {", "}
+                    {home.state}
                   </CardDescription>
                 </CardContent>
-                <CardFooter className="flex justify-between text-sm mt-4">
+                <CardFooter className="flex justify-between text-sm px-4 py-2">
                   <div className="flex items-center">
-                    <BedDouble size={16} className="mr-1" /> {home.bedrooms}
+                    <BedDouble size={20} className="mr-1" /> {home.bedrooms}
                   </div>
                   <div className="flex items-center">
-                    <Car size={16} className="mr-1" /> {home.parking}
+                    <Car size={20} className="mr-1" /> {home.parking}
                   </div>
                   <div className="flex items-center">
-                    <ChartArea size={16} className="mr-1" /> {home.sqft}
+                    <ChartArea size={20} className="mr-1" /> {home.sqft}
                   </div>
                 </CardFooter>
               </Card>

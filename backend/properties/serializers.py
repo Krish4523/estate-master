@@ -14,6 +14,7 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = [
+            "id",
             "title",
             "description",
             "property_type",
@@ -35,14 +36,8 @@ class PropertySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # images_data = validated_data.pop("images", None)
-        property_instance = Property.objects.create(**validated_data)
         print(validated_data)
-        # Handle images
-        # if images_data:
-        #     print(images_data)
-        #     for image_data in images_data[:4]:
-        #         PropertyImage.objects.create(property=property_instance, **image_data)
-
+        property_instance = Property.objects.create(**validated_data)
         return property_instance
 
     def update(self, instance, validated_data):
@@ -52,14 +47,11 @@ class PropertySerializer(serializers.ModelSerializer):
         # Update property instance fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
-
         instance.save()
-
-        if images_data:
-            # Optionally: Clear old images before adding new ones
-            PropertyImage.objects.filter(property=instance).delete()
-
-            for image_data in images_data[:4]:  # Limit to 4 images
-                PropertyImage.objects.create(property=instance, **image_data)
-
+        # if images_data:
+        #     # Optionally: Clear old images before adding new ones
+        #     PropertyImage.objects.filter(property=instance).delete()
+        #
+        #     for image_data in images_data[:4]:  # Limit to 4 images
+        #         PropertyImage.objects.create(property=instance, **image_data)
         return instance

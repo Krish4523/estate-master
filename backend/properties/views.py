@@ -22,48 +22,25 @@ def property_list_view(request):
     return Response(serializer.data)
 
 
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# @authentication_classes([TokenAuthentication])
-# def save_property_view(request):
-#     print(request.data)
-#     if Property.objects.filter(title=request.data.get("title")).exists():
-#         print("Property Already Exist")
-#         return JsonResponse({"message": "unsuccessful"}, status=400)
-
-#     serializer = PropertySerializer(data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
-#         print("Property Saved")
-#         return Response({"message": "successful"})
-
-#     return Response(serializer.errors, status=400)
-
-
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def save_property_view(request):
-    # Check if the property already exists
     if Property.objects.filter(title=request.data.get("title")).exists():
         return JsonResponse({"message": "Property already exists"}, status=400)
 
-    # Deserialize and validate property data (excluding images)
     property_data = request.data.copy()
     property_data.pop("images[]", None)  # Exclude images from data passed to serializer
 
     serializer = PropertySerializer(data=property_data)
-    
     if serializer.is_valid():
         property_instance = serializer.save()
-
-        # Handle the image files in the request.FILES
         images = request.FILES.getlist("images[]")
         if images:
-            for image in images[:4]:  # Limit to 4 images
+            for image in images[:4]:
                 PropertyImage.objects.create(property=property_instance, image=image)
 
-        return Response({"message": "Property saved successfully"}, status=200)
+        return Response({"message": "Property details submitted.\nIt will show in listings after verification."}, status=200)
     print(serializer.errors)
     return Response(serializer.errors, status=400)
 

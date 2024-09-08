@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/auth/user/`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/auth/user/`,
           {
             headers: {
               Authorization: `Token ${authToken}`,
@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
 
     await submitForm({
       data: formData,
-      endpoint: `${import.meta.env.VITE_API_BASE_URL}/auth/login/`,
+      endpoint: `${import.meta.env.VITE_API_BASE_URL}/api/auth/login/`,
       setLoading,
       setErrorMessage,
       onSuccess: (response) => {
@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/logout/`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/logout/`,
         {},
         {
           headers: {
@@ -112,7 +112,7 @@ export const AuthProvider = ({ children }) => {
   const signup = async (data) => {
     await submitForm({
       data,
-      endpoint: `${import.meta.env.VITE_API_BASE_URL}/auth/register/`,
+      endpoint: `${import.meta.env.VITE_API_BASE_URL}/api/auth/register/`,
       setLoading,
       setErrorMessage,
       onSuccess: (response) => {
@@ -132,7 +132,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/verify-otp/`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/verify-otp/`,
         { email, otp }
       );
       localStorage.setItem("authToken", response.data.token);
@@ -151,7 +151,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/resend-otp/`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/resend-otp/`,
         { email }
       );
       setErrorMessage(null);

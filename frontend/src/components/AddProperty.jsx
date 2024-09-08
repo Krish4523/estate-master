@@ -21,10 +21,14 @@ import {
 } from "@/components/ui/select.jsx";
 import { PropertySchema } from "@/utils/schemas.js";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import * as response from "autoprefixer";
 
 function AddProperty() {
   const { authToken, user } = useAuth();
   const [agents, setAgents] = useState([]);
+  const navigate = useNavigate();
 
   const form = useForm({
     resolver: zodResolver(PropertySchema),
@@ -50,7 +54,7 @@ function AddProperty() {
     const fetchAgents = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/agents/`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/agents/`,
           {
             headers: {
               Authorization: `Token ${authToken}`,
@@ -72,7 +76,7 @@ function AddProperty() {
     console.log(data);
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/property/save/`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/property/save/`,
         data,
         {
           headers: {
@@ -82,15 +86,12 @@ function AddProperty() {
         }
       );
       console.log(response);
-      // const responseMsg =
-      //   response.data.message === "successful"
-      //     ? "Property Registered Successfully"
-      //     : "Property Already Exists";
-      // document.getElementById("op").innerText = responseMsg;
-      // document.getElementById("op").style.color =
-      //   response.data.message === "successful" ? "green" : "red";
+
+      toast.success(response.data.message);
+      navigate("/");
     } catch (error) {
       console.error(error);
+      toast.error(error.response.data?.message);
     }
   };
 

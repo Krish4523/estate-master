@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BedDouble, Car, ChartArea, MapPin, Search } from "lucide-react";
+import {
+  BedDouble,
+  Car,
+  ChartArea,
+  MapPin,
+  Search,
+  Building,
+} from "lucide-react";
 import axios from "axios";
 import { Input } from "@/components/ui/input.jsx";
 import {
@@ -19,6 +26,7 @@ import {
   CardTitle,
 } from "@/components/ui/card.jsx";
 import { useAuth } from "@/contexts/AuthContext.jsx";
+import { formatCurrency } from "@/utils/formatter.js";
 
 function Listing() {
   const { authToken } = useAuth();
@@ -218,12 +226,17 @@ function Listing() {
                 <CardContent className="px-4 py-2">
                   <CardTitle className="flex justify-between flex-wrap gap-2 text-lg font-semibold">
                     <span>{home.title}</span>
-                    <span>${home.price}</span>
+                    <span>{formatCurrency(home.price)}</span>
                   </CardTitle>
-                  <CardDescription className="flex items-center text-sm mt-2">
-                    <MapPin size={16} className="mr-1" /> {home.city}
-                    {", "}
-                    {home.state}
+                  <CardDescription className="flex flex-col gap-2 text-sm mt-2">
+                    <span className="flex items-center">
+                      <MapPin size={20} className="mr-1" /> {home.local_address}
+                    </span>
+                    <span className="flex items-center">
+                      <Building size={20} className="mr-1" /> {home.city}
+                      {", "}
+                      {home.state}
+                    </span>
                   </CardDescription>
                 </CardContent>
                 <CardFooter className="flex justify-between text-sm px-4 py-2">

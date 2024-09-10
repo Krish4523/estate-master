@@ -1,10 +1,12 @@
-./.idea/*
-./idea/codeStyles
+.idea/**/*
+.idea/codeStyles/
+.idea/inspectionProfiles/
 
 backend/.env
 backend/.venv
-/backend/media/
-/backend/media/property_images/
+backend/media/
+backend/media/property_images/
+backend/*/__pycache__/
 
 frontend/.env
 frontend/node_modules

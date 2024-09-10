@@ -23,7 +23,6 @@ import { PropertySchema } from "@/utils/schemas.js";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import * as response from "autoprefixer";
 
 function AddProperty() {
   const { authToken, user } = useAuth();
@@ -86,7 +85,6 @@ function AddProperty() {
         }
       );
       console.log(response);
-
       toast.success(response.data.message);
       navigate("/");
     } catch (error) {

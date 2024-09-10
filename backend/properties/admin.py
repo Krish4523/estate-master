@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Property, PropertyImage
+from .models import Property, PropertyImage, NearbyPlace
 
 
 @admin.register(Property)
@@ -38,3 +38,6 @@ class PropertyImageAdmin(admin.ModelAdmin):
     list_display = ("property", "image")
     search_fields = ("property__title",)
     ordering = ("property",)
+
+
+admin.site.register(NearbyPlace)

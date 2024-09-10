@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import {
@@ -8,6 +8,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
+  FormLabel,
 } from "@/components/ui/form.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Button } from "@/components/ui/button.jsx";
@@ -23,6 +24,13 @@ import { PropertySchema } from "@/utils/schemas.js";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { Trash2, UserPlus } from "lucide-react";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 function AddProperty() {
   const { authToken, user } = useAuth();
@@ -42,10 +50,23 @@ function AddProperty() {
       pincode: "",
       sqft: "",
       bedrooms: "",
+      latitude: "",
+      longitude: "",
       parking: "",
       agent: "",
       images: [],
+      nearby_places: [{ name: "", distance: "", place_type: "" }], // Initial nearby place
     },
+  });
+
+  // UseFieldArray to handle nearbyPlaces dynamically
+  const {
+    fields: nearbyPlacesFields,
+    append,
+    remove,
+  } = useFieldArray({
+    name: "nearby_places",
+    control: form.control,
   });
 
   // Fetch agents from API
@@ -69,10 +90,11 @@ function AddProperty() {
   }, [authToken]);
 
   const onSubmit = async (data) => {
-    data.is_varified = false;
+    data.is_verified = false;
     data.is_sold = false;
     data.seller = user.id;
     console.log(data);
+    console.log(authToken);
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/property/save/`,
@@ -84,7 +106,6 @@ function AddProperty() {
           },
         }
       );
-      console.log(response);
       toast.success(response.data.message);
       navigate("/");
     } catch (error) {
@@ -161,7 +182,6 @@ function AddProperty() {
                     value={field.value ? String(field.value) : ""}
                   >
                     <SelectTrigger>
-                      {/* Display the agent's name */}
                       <SelectValue placeholder="Select Agent">
                         {field.value
                           ? agents.find((agent) => agent.id === field.value)
@@ -214,94 +234,219 @@ function AddProperty() {
               </FormItem>
             )}
           />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="latitude"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input type="number" placeholder="latitude" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="longitude"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input type="number" placeholder="longitude" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          {/* City Field */}
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="City" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* City Field */}
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="City" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* State Field */}
-          <FormField
-            control={form.control}
-            name="state"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="State" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* State Field */}
+            <FormField
+              control={form.control}
+              name="state"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="State" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Pincode Field */}
-          <FormField
-            control={form.control}
-            name="pincode"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input type="number" placeholder="PIN Code" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Pincode Field */}
+            <FormField
+              control={form.control}
+              name="pincode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input type="number" placeholder="PIN Code" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          {/* Square Feet Field */}
-          <FormField
-            control={form.control}
-            name="sqft"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input type="number" placeholder="Area (sqft)" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {/* Square Feet, Bedrooms, Parking Fields - Inline */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Square Feet Field */}
+            <FormField
+              control={form.control}
+              name="sqft"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input type="number" placeholder="Area (sqft)" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Bedrooms Field */}
-          <FormField
-            control={form.control}
-            name="bedrooms"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input type="number" placeholder="Bedrooms" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Bedrooms Field */}
+            <FormField
+              control={form.control}
+              name="bedrooms"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input type="number" placeholder="Bedrooms" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Parking Field */}
-          <FormField
-            control={form.control}
-            name="parking"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Parking Spaces"
-                    {...field}
+            {/* Parking Field */}
+            <FormField
+              control={form.control}
+              name="parking"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Parking Spaces"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Nearby Places Section */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <FormLabel>Nearby Places</FormLabel>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() =>
+                        append({ name: "", distance: "", place_type: "" })
+                      }
+                    >
+                      <UserPlus size={16} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-muted text-muted-foreground">
+                    <p>Add Nearby Place</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+
+            {nearbyPlacesFields.map((field, index) => (
+              <div key={field.id} className="flex items-center gap-4 mb-6">
+                <div className="flex flex-col sm:flex-row flex-1 gap-2">
+                  <FormField
+                    control={form.control}
+                    name={`nearby_places.${index}.name`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input placeholder="Place Name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormField
+                    control={form.control}
+                    name={`nearby_places.${index}.distance`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Distance (km)"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`nearby_places.${index}.place_type`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            placeholder="Place Type (e.g., school, park)"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-muted text-muted-foreground">
+                      <p>Remove Place</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            ))}
+          </div>
 
           {/* Image Upload */}
           <FormField
@@ -331,7 +476,6 @@ function AddProperty() {
           </Button>
         </form>
       </Form>
-      <h2 id="op" className="text-center mt-4"></h2>
     </div>
   );
 }

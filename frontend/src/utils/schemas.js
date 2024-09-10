@@ -60,6 +60,18 @@ export const PropertySchema = z.object({
   sqft: z.coerce.number().positive("Area must be a positive number"),
   bedrooms: z.coerce.number().min(1, "At least one bedroom is required"),
   parking: z.coerce.number().min(0, "Parking spaces cannot be negative"),
+  latitude: z.coerce.number(),
+  longitude: z.coerce.number(),
   images: z.array(z.instanceof(File)).min(4, "Please upload at least 4 images"),
   agent: z.coerce.number().positive("Please select an agent"),
+  nearby_places: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Place name is required"),
+        distance: z.coerce.number().positive("Distance must be positive"),
+        place_type: z.string().min(1, "Place type is required"),
+      })
+    )
+    .min(1, "Please add at least one nearby place")
+    .max(3, "Please add upto 3 nearby places"),
 });

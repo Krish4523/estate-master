@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Property, PropertyImage
+from .models import Property, PropertyImage, NearbyPlace
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -14,29 +14,30 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = [
-            "id",
             "title",
+            "price",
             "description",
             "property_type",
-            "price",
             "local_address",
             "city",
             "state",
             "pincode",
-            "sqft",
             "bedrooms",
             "parking",
-            "listed_date",
+            "sqft",
+            # "nearby_places",
+            "latitude",
+            "longitude",
+            "images",
             "is_verified",
             "is_sold",
-            "seller",
             "agent",
-            "images",
+            "seller",
         ]
 
     def create(self, validated_data):
         # images_data = validated_data.pop("images", None)
-        print(validated_data)
+        # print(validated_data)
         property_instance = Property.objects.create(**validated_data)
         return property_instance
 
@@ -55,3 +56,9 @@ class PropertySerializer(serializers.ModelSerializer):
         #     for image_data in images_data[:4]:  # Limit to 4 images
         #         PropertyImage.objects.create(property=instance, **image_data)
         return instance
+
+
+class NearbyPlaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NearbyPlace
+        fields = ["name", "distance", "place_type"]

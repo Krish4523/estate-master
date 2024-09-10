@@ -4,13 +4,14 @@ from django.http import JsonResponse
 from accounts.models import User
 from accounts.serializers import AgentSerializer
 from .serializers import PropertySerializer
-from .models import Property, PropertyImage
+from .models import Property, PropertyImage, NearbyPlace
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import (
     api_view,
     permission_classes,
     authentication_classes,
 )
+from collections import defaultdict
 
 
 @api_view(["GET"])
@@ -29,18 +30,62 @@ def save_property_view(request):
     if Property.objects.filter(title=request.data.get("title")).exists():
         return JsonResponse({"message": "Property already exists"}, status=400)
 
+    # Extract property data and nearby places data
     property_data = request.data.copy()
-    property_data.pop("images[]", None)  # Exclude images from data passed to serializer
 
+    # Extracting images[] from the request
+    property_data.pop("images[]", None)
+
+    # Extract nearby_places data
+    nearby_places_data = defaultdict(dict)
+    for key, value in property_data.items():
+        if key.startswith("nearby_places"):
+            # Extract the index and the actual field name
+            index = key.split("[")[1].split("]")[
+                0
+            ]  # Extracting the index, e.g., 0, 1, etc.
+            field = key.split("[")[2].split("]")[
+                0
+            ]  # Extracting the field name, e.g., name, distance, etc.
+            nearby_places_data[index][field] = value
+
+    nearby_places_list = [dict(item) for item in nearby_places_data.values()]
+
+    for key in list(property_data.keys()):
+        if key.startswith("nearby_places"):
+            del property_data[key]
+    # Serialize and validate property data
     serializer = PropertySerializer(data=property_data)
+    print(property_data)  # For debugging
+    print(nearby_places_list)
     if serializer.is_valid():
         property_instance = serializer.save()
+
+        # Handle image uploads
         images = request.FILES.getlist("images[]")
         if images:
-            for image in images[:4]:
+            for image in images[:4]:  # Limit to 4 images
                 PropertyImage.objects.create(property=property_instance, image=image)
 
-        return Response({"message": "Property details submitted.\nIt will show in listings after verification."}, status=200)
+        # Handle nearby places if provided
+        if nearby_places_list:
+            for nearby_place in nearby_places_list:
+                NearbyPlace.objects.create(
+                    property=property_instance,
+                    name=nearby_place["name"],  # Extract value from list
+                    distance=nearby_place["distance"],  # Extract value from list
+                    place_type=nearby_place["place_type"],  # Extract value from list
+                )
+                # property_instance.nearby_places.set(nearby_place_instances)
+
+        return Response(
+            {
+                "message": "Property details submitted.\nIt will show in listings after verification."
+            },
+            status=200,
+        )
+
+    # If serializer is not valid, return errors
     print(serializer.errors)
     return Response(serializer.errors, status=400)
 

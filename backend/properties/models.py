@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import User
+from django.conf import settings
 
 
 class Property(models.Model):
@@ -22,14 +22,21 @@ class Property(models.Model):
     parking = models.IntegerField()
     listed_date = models.DateTimeField(auto_now_add=True)
 
+    latitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
+    longitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
+
     is_verified = models.BooleanField(default=False)
     is_sold = models.BooleanField(default=False)
 
     seller = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="properties"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="properties"
     )
     agent = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         related_name="agent_properties",
         null=True,
@@ -48,3 +55,25 @@ class PropertyImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.property.title}"
+
+
+class NearbyPlace(models.Model):
+    # PROPERTY_PLACE_TYPE_CHOICES = [
+    #     ("school", "School"),
+    #     ("hospital", "Hospital"),
+    #     ("mall", "Mall"),
+    #     ("park", "Park"),
+    #     # Add more place types if needed
+    # ]
+
+    property = models.ForeignKey(
+        Property, on_delete=models.CASCADE, related_name="nearby_places"
+    )
+    name = models.CharField(max_length=255)
+    distance = models.DecimalField(
+        max_digits=5, decimal_places=2, help_text="Distance in kilometers"
+    )
+    place_type = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.name} ({self.place_type}) - {self.distance} km"

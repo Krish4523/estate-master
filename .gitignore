@@ -1,6 +1,4 @@
-.idea/**/*
-.idea/codeStyles/
-.idea/inspectionProfiles/
+.idea/
 
 backend/.env
 backend/.venv

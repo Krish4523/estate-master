@@ -24,7 +24,7 @@ import { PropertySchema } from "@/utils/schemas.js";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { Trash2, UserPlus } from "lucide-react";
+import { Trash2, MapPinPlus } from "lucide-react";
 import {
   Tooltip,
   TooltipProvider,
@@ -59,7 +59,6 @@ function AddProperty() {
     },
   });
 
-  // UseFieldArray to handle nearbyPlaces dynamically
   const {
     fields: nearbyPlacesFields,
     append,
@@ -306,7 +305,7 @@ function AddProperty() {
           </div>
 
           {/* Square Feet, Bedrooms, Parking Fields - Inline */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {/* Square Feet Field */}
             <FormField
               control={form.control}
@@ -369,7 +368,7 @@ function AddProperty() {
                         append({ name: "", distance: "", place_type: "" })
                       }
                     >
-                      <UserPlus size={16} />
+                      <MapPinPlus size={16} />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent className="bg-muted text-muted-foreground">
@@ -380,7 +379,7 @@ function AddProperty() {
             </div>
 
             {nearbyPlacesFields.map((field, index) => (
-              <div key={field.id} className="flex items-center gap-4 mb-6">
+              <div key={field.id} className="flex items-start gap-4 mb-6">
                 <div className="flex flex-col sm:flex-row flex-1 gap-2">
                   <FormField
                     control={form.control}
@@ -454,6 +453,7 @@ function AddProperty() {
             name="images"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Property Images</FormLabel>
                 <FormControl>
                   <Input
                     type="file"

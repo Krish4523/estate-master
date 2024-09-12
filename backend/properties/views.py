@@ -18,7 +18,7 @@ from collections import defaultdict
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def property_list_view(request):
-    properties = Property.objects.all()
+    properties = Property.objects.filter(is_verified=True, is_sold=False)
     serializer = PropertySerializer(properties, many=True)
     return Response(serializer.data)
 
@@ -30,33 +30,24 @@ def save_property_view(request):
     if Property.objects.filter(title=request.data.get("title")).exists():
         return JsonResponse({"message": "Property already exists"}, status=400)
 
-    # Extract property data and nearby places data
     property_data = request.data.copy()
-
-    # Extracting images[] from the request
     property_data.pop("images[]", None)
 
-    # Extract nearby_places data
     nearby_places_data = defaultdict(dict)
     for key, value in property_data.items():
         if key.startswith("nearby_places"):
             # Extract the index and the actual field name
-            index = key.split("[")[1].split("]")[
-                0
-            ]  # Extracting the index, e.g., 0, 1, etc.
-            field = key.split("[")[2].split("]")[
-                0
-            ]  # Extracting the field name, e.g., name, distance, etc.
+            index = key.split("[")[1].split("]")[0]
+            field = key.split("[")[2].split("]")[0]
             nearby_places_data[index][field] = value
-
     nearby_places_list = [dict(item) for item in nearby_places_data.values()]
 
     for key in list(property_data.keys()):
         if key.startswith("nearby_places"):
             del property_data[key]
-    # Serialize and validate property data
+
     serializer = PropertySerializer(data=property_data)
-    print(property_data)  # For debugging
+    print(property_data)
     print(nearby_places_list)
     if serializer.is_valid():
         property_instance = serializer.save()
@@ -93,9 +84,20 @@ def save_property_view(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
+def find_property(request, property_id):
+    property = Property.objects.filter(pk=property_id).first()
+    if property:
+        serializer = PropertySerializer(property)
+        return Response(serializer.data)
+    else:
+        return JsonResponse({'message': 'Property Not Found'})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
 def get_agents(request):
     if request.user.is_authenticated:
-        print("hii")
         agents = User.objects.filter(role="agent")
         serializer = AgentSerializer(agents, many=True)
         print(serializer.data)

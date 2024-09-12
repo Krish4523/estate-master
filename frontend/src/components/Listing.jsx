@@ -212,10 +212,13 @@ function Listing() {
         </div>
 
         {/* List of Homes */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 p-4">
           {filteredHomes.map((home) => (
-            <Link to={`/property?id=${home.id}`} key={home.id}>
-              <Card className="transition-transform transform hover:shadow-lg">
+            <Link to={`/property/${home.id}`} key={home.id}>
+              <Card
+                className="transition-transform transform hover:shadow-lg"
+                key={home.id}
+              >
                 <CardHeader className="p-2">
                   <img
                     src={`${import.meta.env.VITE_API_BASE_URL}/${home.images[0]?.image}`}

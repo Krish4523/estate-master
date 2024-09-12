@@ -15,8 +15,8 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 
 const navItems = [
   { item: "Home", href: "/" },
-  { item: "Listing", href: "/listing" },
-  { item: "Add", href: "/add" },
+  { item: "Listing", href: "/listings" },
+  { item: "Add", href: "/add-property" },
   { item: "About", href: "/about" },
 ];
 

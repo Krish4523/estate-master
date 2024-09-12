@@ -8,12 +8,20 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         fields = ["id", "image"]
 
 
+class NearbyPlaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NearbyPlace
+        fields = ["name", "distance", "place_type"]
+
+
 class PropertySerializer(serializers.ModelSerializer):
     images = PropertyImageSerializer(many=True, required=False)
+    nearby_places = NearbyPlaceSerializer(many=True, read_only=True)
 
     class Meta:
         model = Property
         fields = [
+            "id",
             "title",
             "price",
             "description",
@@ -25,7 +33,6 @@ class PropertySerializer(serializers.ModelSerializer):
             "bedrooms",
             "parking",
             "sqft",
-            # "nearby_places",
             "latitude",
             "longitude",
             "images",
@@ -33,6 +40,7 @@ class PropertySerializer(serializers.ModelSerializer):
             "is_sold",
             "agent",
             "seller",
+            "nearby_places",
         ]
 
     def create(self, validated_data):
@@ -56,9 +64,3 @@ class PropertySerializer(serializers.ModelSerializer):
         #     for image_data in images_data[:4]:  # Limit to 4 images
         #         PropertyImage.objects.create(property=instance, **image_data)
         return instance
-
-
-class NearbyPlaceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NearbyPlace
-        fields = ["name", "distance", "place_type"]

@@ -19,10 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
-// import { useNavigate } from "react-router-dom";
-// import { useState } from "react";
 import { Loader2 } from "lucide-react";
-// import { submitForm } from "@/utils/submitForm.js";
 import { useAuth } from "@/contexts/AuthContext";
 
 const inputFields = [
@@ -34,39 +31,7 @@ const inputFields = [
 ];
 
 function Signup() {
-  /*const [errorMessage, setErrorMessage] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const form = useForm({
-    resolver: zodResolver(SignUpSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confPassword: "",
-      phone: "",
-    },
-  });
-
-  const navigate = useNavigate();
-
-  async function onSubmit(data) {
-    const { name, email, password, phone } = data;
-    data = { name, email, password, phone };
-    await submitForm({
-      data,
-      endpoint: "http://localhost:8000/api/auth/register/",
-      navigate,
-      setLoading,
-      setErrorMessage,
-      onSuccess: (response) => {
-        console.log("Account created successfully:", response);
-        // Additional success logic if needed
-      },
-    });
-  }*/
-
-  const { signup, loading, errorMessage } = useAuth(); // Access auth context
+  const { signup, loading, errorMessage } = useAuth();
   const form = useForm({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
@@ -79,7 +44,7 @@ function Signup() {
   });
 
   const onSubmit = (data) => {
-    signup(data); // Use signup function from context
+    signup(data); 
   };
 
   return (

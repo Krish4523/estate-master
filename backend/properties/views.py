@@ -1,7 +1,7 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.http import JsonResponse
-from accounts.models import User
+from accounts.models import User, Agent
 from accounts.serializers import AgentSerializer
 from .serializers import PropertySerializer
 from .models import Property, PropertyImage, NearbyPlace
@@ -11,14 +11,19 @@ from rest_framework.decorators import (
     permission_classes,
     authentication_classes,
 )
+from django.shortcuts import get_object_or_404
 from collections import defaultdict
+from rest_framework import status
 
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def property_list_view(request):
-    properties = Property.objects.filter(is_verified=True, is_sold=False)
+    if request.user.role == "agent":
+        properties = Property.objects.filter(agent=request.user)
+    else:
+        properties = Property.objects.filter(is_verified=True, is_sold=False)
     serializer = PropertySerializer(properties, many=True)
     return Response(serializer.data)
 
@@ -67,8 +72,11 @@ def save_property_view(request):
                     distance=nearby_place["distance"],  # Extract value from list
                     place_type=nearby_place["place_type"],  # Extract value from list
                 )
-                # property_instance.nearby_places.set(nearby_place_instances)
+        print(property_data["agent"])
 
+        agent = get_object_or_404(Agent, user__id=property_data["agent"])
+        agent.inquiry_listings.add(property_instance)
+        agent.save()
         return Response(
             {
                 "message": "Property details submitted.\nIt will show in listings after verification."
@@ -90,18 +98,31 @@ def find_property(request, property_id):
         serializer = PropertySerializer(property)
         return Response(serializer.data)
     else:
-        return JsonResponse({'message': 'Property Not Found'})
+        return JsonResponse({"message": "Property Not Found"})
 
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])
 def get_agents(request):
-    if request.user.is_authenticated:
-        agents = User.objects.filter(role="agent")
-        serializer = AgentSerializer(agents, many=True)
-        print(serializer.data)
-        return Response(serializer.data)
-    else:
-        print("error")
-        return Response({"message": "unsuccessful"}, status=400)
+    agents = Agent.objects.all()
+    serializer = AgentSerializer(agents, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def find_agent_by_id(request, agent_id):
+    try:
+        user = User.objects.get(id=agent_id)
+        agent = Agent.objects.get(user=user)
+    except User.DoesNotExist:
+        return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+    except Agent.DoesNotExist:
+        return Response(
+            {"error": "Agent profile not found."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    serializer = AgentSerializer(agent)
+    return Response(serializer.data, status=status.HTTP_200_OK)

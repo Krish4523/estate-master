@@ -80,13 +80,18 @@ function AddProperty() {
             },
           }
         );
-        setAgents(response.data);
+        console.log(response.data);
+        setAgents(response?.data);
       } catch (error) {
         console.error("Error fetching agents:", error);
       }
     };
     fetchAgents();
-  }, [authToken]);
+  }, [authToken, setAgents]);
+
+  useEffect(() => {
+    console.log("Updated agents state:", agents[0]?.user?.id);
+  }, [agents]);
 
   const onSubmit = async (data) => {
     data.is_verified = false;
@@ -189,11 +194,23 @@ function AddProperty() {
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      {agents.map((agent) => (
-                        <SelectItem key={agent.id} value={String(agent.id)}>
-                          {agent.name}
+                      {agents.length > 0 ? (
+                        agents.map((agent) => (
+                          <SelectItem
+                            key={agent?.user?.id}
+                            value={String(agent?.user?.id)}
+                          >
+                            <div className="flex flex-col gap-1">
+                              <div>{agent.user.name}</div>
+                              <div>Rating: {agent.rating}</div>
+                            </div>
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem disabled value="loading">
+                          Loading agents...
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectContent>
                   </Select>
                 </FormControl>

@@ -17,7 +17,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-import { Image, MapPin } from "lucide-react";
+import { Bed, Car, Image, LandPlot, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
@@ -30,6 +30,7 @@ function Property() {
 
   const navigate = useNavigate();
   const [home, setHome] = useState([]);
+  const [agent, setAgent] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [data, setData] = useState({
     property: id,
@@ -39,14 +40,25 @@ function Property() {
 
   const handleConfirm = () => {
     console.log(data);
-    axios
-      .post("http://localhost:8000/appointment/book/", data)
-      .then((response) => {
-        console.log(response.data.message);
-      })
-      .catch((error) => {
+    const bookAppointment = async () => {
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/api/appointment/book/`,
+          data,
+          {
+            headers: {
+              Authorization: `Token ${authToken}`,
+            },
+          }
+        );
+        console.log(response.data);
+        toast.success("Appointment booked successfully");
+      } catch (error) {
         console.log(error);
-      });
+        toast.error(error.response?.data.message);
+      }
+    };
+    bookAppointment();
     setShowDialog(false);
   };
 
@@ -71,9 +83,35 @@ function Property() {
     };
     fetchProperty();
   }, [authToken, id, navigate, setHome]);
-  console.log(home);
+
+  useEffect(() => {
+    if (home.agent) {
+      const fetchAgent = async () => {
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/api/agents/${home.agent}`,
+            {
+              headers: {
+                Authorization: `Token ${authToken}`,
+              },
+            }
+          );
+          setAgent(response.data); // Set agent info
+        } catch (err) {
+          console.log(err);
+          toast.error("Error fetching agent information.");
+        }
+      };
+
+      fetchAgent();
+    }
+  }, [authToken, home.agent]);
+
+  // console.log(home);
+  // console.log(agent);
+
   return (
-    <div className="flex flex-col lg:flex-row lg:px-16 px-4 py-8 space-y-8 lg:space-y-0 lg:space-x-8">
+    <div className="flex flex-col lg:flex-row px-4 space-y-8 lg:space-y-0 lg:space-x-8">
       {/* Left side: Main content */}
       <div className="lg:w-2/3 space-y-8">
         {/* Image Section */}
@@ -104,7 +142,7 @@ function Property() {
 
         {/* Property Details */}
         <div className="space-y-4">
-          <div className="flex flex-col  font-bold text-2xl sm:flex-row gap-2 justify-between">
+          <div className="flex flex-wrap gap-2 justify-between font-bold text-xl sm:text-2xl">
             <h1>{home.title}</h1>
             <span>{formatCurrency(home.price)}</span>
           </div>
@@ -115,10 +153,21 @@ function Property() {
         </div>
 
         {/* Agent Info */}
-        <div className="bg-secondary p-6 rounded-lg">
+        <div className="bg-white shadow-lg p-4 rounded-lg">
           <div className="flex items-center space-x-4">
-            <img src={i1} alt="Agent" className="w-12 h-12 rounded-full" />
-            <p>Agent Name</p>
+            <img
+              src={agent?.profile_image || i1}
+              alt="Agent"
+              className="w-12 h-12 rounded-full"
+            />
+            <div>
+              <p className="font-semibold">
+                {agent?.user.name || "Unknown Agent"}
+              </p>
+              <p className="text-sm text-gray-500">
+                Rating: {agent?.rating || "N/A"}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -132,17 +181,21 @@ function Property() {
       </div>
 
       {/* Right side: Sidebar */}
-      <div className="lg:w-1/3 p-2 lg:p-6 rounded-lg space-y-6">
-        {/* Sizes */}
+      <div className="lg:w-1/3 p-2 lg:p-6 lg:pe-0 rounded-lg space-y-6">
         <div>
-          <h2 className="text-xl font-semibold">Sizes</h2>
-          <div className="flex justify-between mt-2 text-sm">
-            <div className="bg-secondary p-2 rounded-md">{home.sqft} sqft</div>
-            <div className="bg-secondary p-2 rounded-md">
-              {home.bedrooms} beds
+          <h2 className="text-xl font-semibold">Details</h2>
+          <div className="flex gap-2 sm:gap-8 lg:gap-2 mt-2 text-sm">
+            <div className="flex flex-wrap gap-1 bg-secondary p-2 rounded-md">
+              <LandPlot size={20} />
+              <span>{home.sqft} sqft</span>
             </div>
-            <div className="bg-secondary p-2 rounded-md">
-              {home.parking} parking
+            <div className="flex flex-wrap gap-1 bg-secondary p-2 rounded-md">
+              <Bed size={20} />
+              <span>{home.bedrooms} beds</span>
+            </div>
+            <div className="flex flex-wrap gap-1 bg-secondary p-2 rounded-md">
+              <Car size={20} />
+              <span>{home.parking} parking</span>
             </div>
           </div>
         </div>
@@ -176,15 +229,19 @@ function Property() {
         {/* Location */}
         <div>
           <h2 className="text-xl font-semibold">Location</h2>
-          <div className="bg-secondary p-4 rounded-md mt-2">
+          <div className="bg-secondary p-4 min-h-96 md:h-auto rounded-md mt-2">
             <Image className="w-full h-auto rounded-md" />
           </div>
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-between space-x-4">
-          <Button onClick={() => setShowDialog(true)}>Book Now</Button>
-          <Button variant="outline">Save the place</Button>
+        <div className="flex space-x-4">
+          <Button size="sm" onClick={() => setShowDialog(true)}>
+            Book Appointment
+          </Button>
+          <Button size="sm" variant="outline">
+            Add to Favorites
+          </Button>
         </div>
 
         {/* Dialog for booking */}

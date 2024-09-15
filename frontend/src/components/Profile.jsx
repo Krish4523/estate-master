@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,17 +40,23 @@ import toast from "react-hot-toast";
 function Profile() {
   const { id } = useParams();
   const { user, authToken } = useAuth();
+  const navigate = useNavigate();
   console.log(user);
+
   const [profile, setProfile] = useState({
     name: user.name,
     email: user.email,
     phone: user.phone,
-    avatar: user?.avatar || i1,
+    avatar: `${import.meta.env.VITE_API_BASE_URL}${user.avatar}` || i1,
   });
-  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || i1);
+  const [avatarPreview, setAvatarPreview] = useState(
+    `${import.meta.env.VITE_API_BASE_URL}${user.avatar}` || i1
+  );
   const [userDetails, setUserDetails] = useState({});
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [isEditLoading, setIsEditLoading] = useState(false);
+  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
 
   const editProfileForm = useForm({
     resolver: zodResolver(editProfileSchema),
@@ -75,8 +81,8 @@ function Profile() {
             },
           }
         );
-        const data = { role: response.data.user.role };
         console.log(response.data);
+        const data = { role: response.data.user.role };
         if (data.role === "customer") {
           data.favProperties = response.data.fav_properties;
           data.ownProperties = response.data.own_properties;
@@ -87,18 +93,15 @@ function Profile() {
         console.log(data);
         setUserDetails(data);
       } catch (error) {
-        console.log(error);
         toast.error(error?.response?.data?.message);
       }
     };
     getProperties();
-  }, [authToken, editProfileForm, id, user.id]);
+  }, [authToken, id, user.id]);
 
   const handleEditProfile = async (data) => {
+    setIsEditLoading(true);
     try {
-      setShowEditDialog(true);
-      console.log(data);
-
       const response = await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}/api/profile/edit/${user.id}`,
         data,
@@ -109,20 +112,20 @@ function Profile() {
           },
         }
       );
-      console.log(response);
       setProfile({ ...profile, ...response.data });
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error(error.response.data.message);
-    } finally {
+      toast.success("Profile updated successfully!");
       setShowEditDialog(false);
+    } catch (error) {
+      toast.error("Error updating profile: " + error?.response?.data?.message);
+    } finally {
+      setIsEditLoading(false);
+      navigate(0);
     }
   };
 
   const handleChangePassword = async (data) => {
-    console.log(data);
+    setIsPasswordLoading(true);
     try {
-      setShowPasswordDialog(true);
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/auth/change-password/`,
         {
@@ -136,14 +139,14 @@ function Profile() {
           },
         }
       );
-      console.log(response);
       toast.success(response.data.message);
       changePasswordForm.reset();
-    } catch (error) {
-      console.error("Error changing password:", error);
-      toast.error(error?.response?.data?.error);
-    } finally {
       setShowPasswordDialog(false);
+    } catch (error) {
+      toast.error("Error changing password: " + error?.response?.data?.error);
+    } finally {
+      setIsPasswordLoading(false);
+      navigate(0);
     }
   };
 
@@ -169,8 +172,7 @@ function Profile() {
               <Avatar className="w-28 h-28">
                 <AvatarImage
                   src={
-                    `${import.meta.env.VITE_API_BASE_URL}${profile.avatar}` ||
-                    i1
+                    `${import.meta.env.VITE_API_BASE_URL}${user.avatar}` || i1
                   }
                   alt="Profile"
                 />
@@ -180,15 +182,16 @@ function Profile() {
               </Avatar>
               <h1 className="text-xl sm:text-2xl font-bold">{profile.name}</h1>
               <div className="w-full space-y-2">
-                <div className="flex items-center text-sm gap-1 sm:gap-2">
+                <div className="flex items-center text-sm md:text-xs lg:text-base gap-1 sm:gap-2">
                   <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                   <span>{profile.email}</span>
                 </div>
-                <div className="flex items-center text-sm gap-1 sm:gap-2">
+                <div className="flex items-center text-sm md:text-xs lg:text-base gap-1 sm:gap-2">
                   <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                   <span>{profile.phone}</span>
                 </div>
               </div>
+
               <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
                 <DialogTrigger asChild>
                   <Button className="w-full">
@@ -248,13 +251,14 @@ function Profile() {
                           />
                         )}
                       </FormItem>
-                      <Button type="submit" disabled={showEditDialog}>
-                        {showEditDialog ? "Loading..." : "Save Changes"}
+                      <Button type="submit" disabled={isEditLoading}>
+                        {isEditLoading ? "Saving..." : "Save Changes"}
                       </Button>
                     </form>
                   </Form>
                 </DialogContent>
               </Dialog>
+
               <Dialog
                 open={showPasswordDialog}
                 onOpenChange={setShowPasswordDialog}
@@ -315,8 +319,8 @@ function Profile() {
                           </FormItem>
                         )}
                       />
-                      <Button type="submit" disabled={showPasswordDialog}>
-                        {showPasswordDialog ? "Loading..." : "Change Password"}
+                      <Button type="submit" disabled={isPasswordLoading}>
+                        {isPasswordLoading ? "Changing..." : "Change Password"}
                       </Button>
                     </form>
                   </Form>
@@ -383,7 +387,12 @@ function Profile() {
                       {userDetails.favProperties?.length > 0 ? (
                         userDetails.favProperties.map((property, index) => (
                           <Card key={index} className="mb-2 p-3">
-                            <h4 className="font-medium">{property.name}</h4>
+                            <Link
+                              to={`/property/${property.id}`}
+                              key={property.id}
+                            >
+                              <h4 className="font-medium">{property.name}</h4>
+                            </Link>
                             <p className="text-sm text-muted-foreground">
                               {property.address}
                             </p>
@@ -407,9 +416,14 @@ function Profile() {
                       {userDetails.inquiryListings?.length > 0 ? (
                         userDetails.inquiryListings.map((listing, index) => (
                           <Card key={index} className="mb-2 p-3">
-                            <h4 className="font-medium">{listing.name}</h4>
+                            <Link
+                              to={`/property/${listing.id}`}
+                              key={listing.id}
+                            >
+                              <h4 className="font-medium">{listing.title}</h4>
+                            </Link>
                             <p className="text-sm text-muted-foreground">
-                              {listing.address}
+                              {listing.local_address}
                             </p>
                           </Card>
                         ))
@@ -431,9 +445,14 @@ function Profile() {
                       {userDetails.activeListings?.length > 0 ? (
                         userDetails.activeListings.map((listing, index) => (
                           <Card key={index} className="mb-2 p-3">
-                            <h4 className="font-medium">{listing.name}</h4>
+                            <Link
+                              to={`/property/${listing.id}`}
+                              key={listing.id}
+                            >
+                              <h4 className="font-medium">{listing.title}</h4>
+                            </Link>
                             <p className="text-sm text-muted-foreground">
-                              {listing.address}
+                              {listing.local_address}
                             </p>
                           </Card>
                         ))

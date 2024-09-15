@@ -106,6 +106,37 @@ def find_property(request, property_id):
         return JsonResponse({"message": "Property Not Found"})
 
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def verify_property(request, property_id):
+    try:
+        property = Property.objects.filter(pk=property_id).first()
+        if not property:
+            return Response(
+                {"message": "Property Not Found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        if request.user.role == "agent":
+            agent_profile = Agent.objects.get(user=request.user)
+            if property in agent_profile.inquiry_listings.all():
+                agent_profile.inquiry_listings.remove(property)
+
+            agent_profile.active_listings.add(property)
+
+        property.is_verified = True
+        property.save()
+
+        return Response({"message": "Property Verified Successfully"}, status=200)
+    except Agent.DoesNotExist:
+        return Response(
+            {"message": "Agent profile not found for this user."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication])

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import i1 from "@/assets/images/home1.jpeg";
+// import i1 from "@/assets/images/home1.jpeg";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import {
@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogFooter,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog.jsx";
 import {
   Carousel,
@@ -26,19 +27,21 @@ import { formatCurrency } from "@/utils/formatter.js";
 
 function Property() {
   const { id } = useParams();
-  const { authToken } = useAuth();
-
+  const { user, authToken } = useAuth();
   const navigate = useNavigate();
+
   const [home, setHome] = useState([]);
   const [agent, setAgent] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [data, setData] = useState({
-    property: id,
-    applicant: 1,
-    description: "Enter Description",
+    property: home.id,
+    applicant: user.id,
+    description: "",
+    date: new Date(),
   });
 
-  const handleConfirm = () => {
+  const handleBookAppointment = () => {
+    // setData({ ...data, date: new Date(data.date) });
     console.log(data);
     const bookAppointment = async () => {
       try {
@@ -61,12 +64,35 @@ function Property() {
     bookAppointment();
     setShowDialog(false);
   };
+  const handleConfirm = () => {
+    const bookAppointment = async () => {
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/api/property/verify/${home?.id}/`,
+          {},
+          {
+            headers: {
+              Authorization: `Token ${authToken}`,
+            },
+          }
+        );
+        console.log(response.data);
+        navigate(0);
+        toast.success(response?.data?.message);
+      } catch (error) {
+        console.log(error);
+        toast.error(error.response?.data.message);
+      }
+    };
+    bookAppointment();
+    setShowDialog(false);
+  };
 
   useEffect(() => {
     const fetchProperty = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/property/${id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/property/${id}/`,
           {
             headers: {
               Authorization: `Token ${authToken}`,
@@ -107,13 +133,10 @@ function Property() {
     }
   }, [authToken, home.agent]);
 
-  // console.log(home);
-  // console.log(agent);
-
   return (
     <div className="flex flex-col lg:flex-row px-4 space-y-8 lg:space-y-0 lg:space-x-8">
       {/* Left side: Main content */}
-      <div className="lg:w-2/3 space-y-8">
+      <div className="lg:w-2/3 space-y-8 mb-4">
         {/* Image Section */}
         <div className="flex justify-center w-full px-4 lg:px-8">
           <Carousel className="w-full max-w-lg lg:max-w-none">
@@ -152,24 +175,26 @@ function Property() {
           </p>
         </div>
 
-        {/* Agent Info */}
-        <div className="bg-white shadow-lg p-4 rounded-lg">
-          <div className="flex items-center space-x-4">
-            <img
-              src={agent?.profile_image || i1}
-              alt="Agent"
-              className="w-12 h-12 rounded-full"
-            />
-            <div>
-              <p className="font-semibold">
-                {agent?.user.name || "Unknown Agent"}
-              </p>
-              <p className="text-sm text-gray-500">
-                Rating: {agent?.rating || "N/A"}
-              </p>
+        {/* Conditional Agent Info for Customers */}
+        {user.role === "customer" && agent && (
+          <div className="bg-white shadow-lg p-4 rounded-lg">
+            <div className="flex items-center space-x-4">
+              <img
+                src={`${import.meta.env.VITE_API_BASE_URL}/${agent?.user.avatar}`}
+                alt="Agent"
+                className="w-12 h-12 rounded-full"
+              />
+              <div>
+                <p className="font-semibold">
+                  {agent?.user.name || "Unknown Agent"}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Rating: {agent?.rating || "N/A"}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Description */}
         <div>
@@ -177,6 +202,23 @@ function Property() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <p>{home.description}</p>
           </div>
+        </div>
+
+        <div>
+          {user.role === "customer" ? (
+            <div className="flex space-x-4">
+              <Button onClick={() => setShowDialog(true)}>
+                Book Appointment
+              </Button>
+              <Button variant="outline">Add to Favorites</Button>
+            </div>
+          ) : (
+            !home.is_verified && (
+              <Button onClick={() => setShowDialog(true)}>
+                Verify Property
+              </Button>
+            )
+          )}
         </div>
       </div>
 
@@ -234,34 +276,45 @@ function Property() {
           </div>
         </div>
 
-        {/* Buttons */}
-        <div className="flex space-x-4">
-          <Button size="sm" onClick={() => setShowDialog(true)}>
-            Book Appointment
-          </Button>
-          <Button size="sm" variant="outline">
-            Add to Favorites
-          </Button>
-        </div>
-
         {/* Dialog for booking */}
+
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Book a Date</DialogTitle>
+              <DialogTitle>
+                {user?.role === "customer" ? "Book a Date" : "Verify Property"}
+              </DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <Input
-                type="date"
-                value={data.date}
-                onChange={(e) => setData({ ...data, date: e.target.value })}
-              />
-            </div>
+            <DialogDescription>
+              {user?.role === "customer" ? (
+                <div className="space-y-4">
+                  <Input
+                    type="date"
+                    value={data.date}
+                    onChange={(e) => setData({ ...data, date: e.target.value })}
+                  />
+                  <Input
+                    type="text"
+                    value={data.description}
+                    placeholder="Enter Message"
+                    onChange={(e) =>
+                      setData({ ...data, description: e.target.value })
+                    }
+                  />
+                </div>
+              ) : (
+                <span>Are you sure that you want to verify this property?</span>
+              )}
+            </DialogDescription>
             <DialogFooter className="flex justify-between flex-wrap gap-2">
               <Button variant="outline" onClick={() => setShowDialog(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleConfirm}>Confirm</Button>
+              {user?.role === "customer" ? (
+                <Button onClick={handleBookAppointment}>Confirm</Button>
+              ) : (
+                <Button onClick={handleConfirm}>Confirm</Button>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>

@@ -20,6 +20,7 @@ export const SignUpSchema = z
     phone: z
       .string()
       .length(10, { message: "Phone number must be of 10 digits." }),
+    // role: z.enum["customer", "agent"]
   })
   .refine((data) => data.password === data.confPassword, {
     path: ["confPassword"], // targeting the confPassword field for error message
@@ -58,7 +59,7 @@ export const PropertySchema = z.object({
     .min(100000, "Invalid PIN code")
     .max(999999, "Invalid PIN code"),
   sqft: z.coerce.number().positive("Area must be a positive number"),
-  bedrooms: z.coerce.number().min(1, "At least one bedroom is required"),
+  bedrooms: z.coerce.number().positive("Bedrooms must be a positive number"),
   parking: z.coerce.number().min(0, "Parking spaces cannot be negative"),
   latitude: z.coerce.number(),
   longitude: z.coerce.number(),
@@ -75,3 +76,28 @@ export const PropertySchema = z.object({
     .min(1, "Please add at least one nearby place")
     .max(3, "Please add upto 3 nearby places"),
 });
+
+export const editProfileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  avatar: z.instanceof(File).optional(),
+});
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(6, "Password must be at least 6 characters"),
+    newPassword: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Password must be at least 6 characters"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    message: "New password cannot be the same as the current password",
+    path: ["newPassword"], // This will point the error to newPassword field
+  });

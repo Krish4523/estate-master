@@ -200,7 +200,7 @@ function AddProperty() {
                             key={agent?.user?.id}
                             value={String(agent?.user?.id)}
                           >
-                            <div className="flex flex-col gap-1">
+                            <div className="flex justify-between gap-4">
                               <div>{agent.user.name}</div>
                               <div>Rating: {agent.rating}</div>
                             </div>

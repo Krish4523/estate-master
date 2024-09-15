@@ -1,7 +1,7 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Heart, LogOut, Menu, User } from "lucide-react"; // Importing necessary icons from Lucide
+import { LogOut, Menu, User } from "lucide-react"; // Importing necessary icons from Lucide
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +23,7 @@ const navItems = [
 function Navbar() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className="fixed top-0 w-full h-[60px] bg-white z-50 shadow-md py-2 px-2 md:px-6 lg:px-10 flex justify-between items-center">
@@ -103,12 +104,11 @@ function Navbar() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem
-                as={NavLink}
-                to="/favourites"
                 className="flex items-center space-x-2"
+                onClick={() => navigate("/profile")}
               >
-                <Heart className="h-4 w-4 text-red-600 fill-red-600" />
-                <span>Favorites</span>
+                <User className="h-4 w-4" />
+                <span>Profile</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 as={Button}

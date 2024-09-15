@@ -45,6 +45,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=20, choices=ROLE_CHOICES, default="customer", blank=False, null=False
     )
+    avatar = models.ImageField(upload_to="profile_images/", null=True, blank=True)
 
     # Allow `username` to be optional, but it will be auto-set for regular users
     username = models.CharField(max_length=150, unique=True, blank=True, null=True)

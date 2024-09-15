@@ -10,8 +10,8 @@ from rest_framework.decorators import (
 )
 from rest_framework.response import Response
 from django.core.mail import send_mail
-from .models import User, OTP
-from .serializers import UserSerializer
+from .models import User, OTP, Customer, Agent
+from .serializers import UserSerializer, CustomerSerializer, AgentSerializer
 
 
 @api_view(["POST"])
@@ -192,6 +192,97 @@ def resend_otp(request):
         )
     except User.DoesNotExist:
         return Response({"error": "User not found!"}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def get_user_profile(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        if request.user != user:
+            return Response(
+                {"error": "You are not authorized to view this profile."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if user.role == "customer":
+            customer_profile = Customer.objects.get(user=user)
+            serializer = CustomerSerializer(customer_profile)
+        elif user.role == "agent":
+            agent_profile = Agent.objects.get(user=user)
+            serializer = AgentSerializer(agent_profile)
+        else:
+            return Response(
+                {"error": "Invalid role!"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({"error": "User not found!"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        print(e)
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def update_user_profile(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+
+        # Ensure the requesting user is the owner of the profile
+        if request.user != user:
+            return Response(
+                {"error": "You are not authorized to update this profile."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        data = request.data.copy()
+        if "avatar" in request.FILES:
+            data["avatar"] = request.FILES["avatar"]
+
+        serializer = UserSerializer(user, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "Profile updated successfully", "user": serializer.data},
+                status=status.HTTP_200_OK,
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    except User.DoesNotExist:
+        return Response({"error": "User not found!"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def change_password(request):
+    try:
+        user = request.user
+        old_password = request.data.get("currentPassword")
+        new_password = request.data.get("newPassword")
+
+        if not user.check_password(old_password):
+            return Response(
+                {"error": "Old password is incorrect!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response(
+            {"message": "Password updated successfully!"}, status=status.HTTP_200_OK
+        )
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 def send_otp_email(email, otp_code):

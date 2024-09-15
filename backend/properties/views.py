@@ -1,7 +1,7 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.http import JsonResponse
-from accounts.models import User, Agent
+from accounts.models import User, Agent, Customer
 from accounts.serializers import AgentSerializer
 from .serializers import PropertySerializer
 from .models import Property, PropertyImage, NearbyPlace
@@ -72,11 +72,16 @@ def save_property_view(request):
                     distance=nearby_place["distance"],  # Extract value from list
                     place_type=nearby_place["place_type"],  # Extract value from list
                 )
-        print(property_data["agent"])
 
+        print(property_data["agent"])
+        print(property_data["seller"])
         agent = get_object_or_404(Agent, user__id=property_data["agent"])
         agent.inquiry_listings.add(property_instance)
         agent.save()
+        seller = get_object_or_404(Customer, user__id=property_data["agent"])
+        seller.own_properties.add(property_instance)
+        seller.save()
+
         return Response(
             {
                 "message": "Property details submitted.\nIt will show in listings after verification."

@@ -8,6 +8,7 @@ from accounts.views import get_user_profile, update_user_profile
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/auth/", include("accounts.urls")),
+    path("api/appointment/", include("appointments.urls")),
     path("api/agents/", get_agents, name="get-agents"),
     path("api/agents/<int:agent_id>", find_agent_by_id, name="find-agent-by-id"),
     path("api/profile/<int:user_id>", get_user_profile, name="get-user-profile"),

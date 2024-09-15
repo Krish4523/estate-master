@@ -34,8 +34,8 @@ function Property() {
   const [agent, setAgent] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [data, setData] = useState({
-    property: home.id,
-    applicant: user.id,
+    property: Number(id),
+    customer: user.id,
     description: "",
     date: new Date(),
   });
@@ -46,7 +46,7 @@ function Property() {
     const bookAppointment = async () => {
       try {
         const response = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/api/appointment/book/`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/appointment/create/`,
           data,
           {
             headers: {
@@ -285,27 +285,27 @@ function Property() {
                 {user?.role === "customer" ? "Book a Date" : "Verify Property"}
               </DialogTitle>
             </DialogHeader>
-            <DialogDescription>
-              {user?.role === "customer" ? (
-                <div className="space-y-4">
-                  <Input
-                    type="date"
-                    value={data.date}
-                    onChange={(e) => setData({ ...data, date: e.target.value })}
-                  />
-                  <Input
-                    type="text"
-                    value={data.description}
-                    placeholder="Enter Message"
-                    onChange={(e) =>
-                      setData({ ...data, description: e.target.value })
-                    }
-                  />
-                </div>
-              ) : (
-                <span>Are you sure that you want to verify this property?</span>
-              )}
-            </DialogDescription>
+            <DialogDescription></DialogDescription>
+
+            {user?.role === "customer" ? (
+              <div className="space-y-4">
+                <Input
+                  type="date"
+                  value={data.date}
+                  onChange={(e) => setData({ ...data, date: e.target.value })}
+                />
+                <Input
+                  type="text"
+                  value={data.description}
+                  placeholder="Enter Message"
+                  onChange={(e) =>
+                    setData({ ...data, description: e.target.value })
+                  }
+                />
+              </div>
+            ) : (
+              <span>Are you sure that you want to verify this property?</span>
+            )}
             <DialogFooter className="flex justify-between flex-wrap gap-2">
               <Button variant="outline" onClick={() => setShowDialog(false)}>
                 Cancel

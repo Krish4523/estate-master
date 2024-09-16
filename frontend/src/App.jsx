@@ -11,6 +11,7 @@ import AddProperty from "@/components/AddProperty.jsx";
 import { Toaster } from "react-hot-toast";
 import Property from "@/components/Property.jsx";
 import Profile from "@/components/Profile";
+import Appointments from "./components/Appointments";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="listings" element={<Listing />} />
             <Route path="add-property" element={<AddProperty />} />
             <Route path="property/:id" element={<Property />} />
+            <Route path="appointments" element={<Appointments />} />
             <Route path="profile" element={<Profile />} />
             {/*<Route path="about" element={<About />} />*/}
           </Route>

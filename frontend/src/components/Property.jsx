@@ -18,12 +18,18 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-import { Bed, Car, Image, LandPlot, MapPin } from "lucide-react";
+import { Bed, Car, Heart, Image, LandPlot, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { useAuth } from "@/contexts/AuthContext.jsx";
 import { formatCurrency } from "@/utils/formatter.js";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 function Property() {
   const { id } = useParams();
@@ -41,7 +47,6 @@ function Property() {
   });
 
   const handleBookAppointment = () => {
-    // setData({ ...data, date: new Date(data.date) });
     console.log(data);
     const bookAppointment = async () => {
       try {
@@ -64,8 +69,9 @@ function Property() {
     bookAppointment();
     setShowDialog(false);
   };
+
   const handleConfirm = () => {
-    const bookAppointment = async () => {
+    const verifyProperty = async () => {
       try {
         const response = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/property/verify/${home?.id}/`,
@@ -84,7 +90,7 @@ function Property() {
         toast.error(error.response?.data.message);
       }
     };
-    bookAppointment();
+    verifyProperty();
     setShowDialog(false);
   };
 
@@ -175,6 +181,42 @@ function Property() {
           </p>
         </div>
 
+        <div>
+          {user.role === "customer" ? (
+            <div className="flex justify-between space-x-4">
+              <Button onClick={() => setShowDialog(true)}>
+                Book Appointment
+              </Button>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="rounded-full"
+                    >
+                      <Heart
+                        size={20}
+                        // className={`stroke-red-500 fill-red-500`}
+                      />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-muted text-muted-foreground">
+                    <span>Add to favorites</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          ) : (
+            !home.is_verified && (
+              <Button onClick={() => setShowDialog(true)}>
+                Verify Property
+              </Button>
+            )
+          )}
+        </div>
+
         {/* Conditional Agent Info for Customers */}
         {user.role === "customer" && agent && (
           <div className="bg-white shadow-lg p-4 rounded-lg">
@@ -202,23 +244,6 @@ function Property() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <p>{home.description}</p>
           </div>
-        </div>
-
-        <div>
-          {user.role === "customer" ? (
-            <div className="flex space-x-4">
-              <Button onClick={() => setShowDialog(true)}>
-                Book Appointment
-              </Button>
-              <Button variant="outline">Add to Favorites</Button>
-            </div>
-          ) : (
-            !home.is_verified && (
-              <Button onClick={() => setShowDialog(true)}>
-                Verify Property
-              </Button>
-            )
-          )}
         </div>
       </div>
 

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-// import i1 from "@/assets/images/home1.jpeg";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import {
   Dialog,
@@ -36,7 +35,7 @@ function Property() {
   const { user, authToken } = useAuth();
   const navigate = useNavigate();
 
-  const [home, setHome] = useState([]);
+  const [home, setHome] = useState({});
   const [agent, setAgent] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [data, setData] = useState({
@@ -61,6 +60,8 @@ function Property() {
         );
         console.log(response.data);
         toast.success("Appointment booked successfully");
+        // Optionally refresh data to update `home.has_appointment`
+        setHome((prevHome) => ({ ...prevHome, has_appointment: true }));
       } catch (error) {
         console.log(error);
         toast.error(error.response?.data.message);
@@ -94,6 +95,32 @@ function Property() {
     setShowDialog(false);
   };
 
+  const toggleFavorite = async () => {
+    try {
+      const url = home.has_favorite
+        ? `${import.meta.env.VITE_API_BASE_URL}/api/property/remove_favorite/${home.id}/`
+        : `${import.meta.env.VITE_API_BASE_URL}/api/property/add_favorite/${home.id}/`;
+
+      const response = await axios.post(
+        url,
+        {},
+        {
+          headers: { Authorization: `Token ${authToken}` },
+        }
+      );
+
+      setHome((prevHome) => ({
+        ...prevHome,
+        has_favorite: !prevHome.has_favorite,
+      }));
+      console.log(response.data);
+      toast.success(response.data.message || "Action successful");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update favorites");
+    }
+  };
+
   useEffect(() => {
     const fetchProperty = async () => {
       try {
@@ -114,7 +141,7 @@ function Property() {
       }
     };
     fetchProperty();
-  }, [authToken, id, navigate, setHome]);
+  }, [authToken, id, navigate]);
 
   useEffect(() => {
     if (home.agent) {
@@ -182,11 +209,17 @@ function Property() {
         </div>
 
         <div>
-          {user.role === "customer" ? (
+          {user.role === "customer" && (
             <div className="flex justify-between space-x-4">
-              <Button onClick={() => setShowDialog(true)}>
-                Book Appointment
-              </Button>
+              {!home.has_appointment ? (
+                <Button onClick={() => setShowDialog(true)}>
+                  Book Appointment
+                </Button>
+              ) : (
+                <Link to="/appointments" className="hover:underline">
+                  View Appointment details
+                </Link>
+              )}
 
               <TooltipProvider>
                 <Tooltip>
@@ -195,25 +228,32 @@ function Property() {
                       size="icon"
                       variant="ghost"
                       className="rounded-full"
+                      onClick={toggleFavorite}
                     >
                       <Heart
                         size={20}
-                        // className={`stroke-red-500 fill-red-500`}
+                        className={`${
+                          home.has_favorite
+                            ? "fill-red-500 stroke-red-500"
+                            : "stroke-black"
+                        }`}
                       />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent className="bg-muted text-muted-foreground">
-                    <span>Add to favorites</span>
+                    <span>
+                      {home.has_favorite
+                        ? "Remove from favorites"
+                        : "Add to favorites"}
+                    </span>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
-          ) : (
-            !home.is_verified && (
-              <Button onClick={() => setShowDialog(true)}>
-                Verify Property
-              </Button>
-            )
+          )}
+
+          {user.role !== "customer" && !home.is_verified && (
+            <Button onClick={() => setShowDialog(true)}>Verify Property</Button>
           )}
         </div>
 

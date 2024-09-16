@@ -18,7 +18,7 @@ const navItems = [
   { item: "Listing", href: "/listings" },
   { item: "Appointments", href: "/appointments" },
   { item: "Add", href: "/add-property" },
-  { item: "About", href: "/about" },
+  // { item: "About", href: "/about" },
 ];
 
 function Navbar() {

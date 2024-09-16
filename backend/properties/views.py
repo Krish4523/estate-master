@@ -2,6 +2,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.http import JsonResponse
 from accounts.models import User, Agent, Customer
+from appointments.models import Appointment
 from accounts.serializers import AgentSerializer
 from .serializers import PropertySerializer
 from .models import Property, PropertyImage, NearbyPlace
@@ -99,11 +100,37 @@ def save_property_view(request):
 @authentication_classes([TokenAuthentication])
 def find_property(request, property_id):
     property = Property.objects.filter(pk=property_id).first()
-    if property:
-        serializer = PropertySerializer(property)
-        return Response(serializer.data)
-    else:
-        return JsonResponse({"message": "Property Not Found"})
+
+    if not property:
+        return Response(
+            {"message": "Property Not Found"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Prepare response data
+    response_data = {}
+
+    # Serialize property data
+    serializer = PropertySerializer(property)
+    response_data.update(serializer.data)
+
+    # Check if the user is a customer and gather additional information
+    if hasattr(request.user, "customer_profile"):
+        customer = request.user.customer_profile
+
+        # Check if the property exists in the customer's appointments
+        has_appointment = Appointment.objects.filter(
+            customer=customer, property=property
+        ).exists()
+
+        # Check if the property exists in the customer's favorite properties (fav_properties)
+        has_favorite = property in customer.fav_properties.all()
+
+        # Add the boolean values to the response data
+        response_data["has_appointment"] = has_appointment
+        response_data["has_favorite"] = has_favorite
+
+    # Return the full response
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -133,6 +160,73 @@ def verify_property(request, property_id):
             {"message": "Agent profile not found for this user."},
             status=status.HTTP_404_NOT_FOUND,
         )
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def add_favorite(request, property_id):
+    try:
+        # Check if the user is a customer
+        if not hasattr(request.user, "customer_profile"):
+            return Response(
+                {"error": "Only customers can add favorites."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        customer = request.user.customer_profile  # Access the customer profile
+
+        # Get the property to add to favorites
+        property = Property.objects.filter(pk=property_id).first()
+        if not property:
+            return Response(
+                {"error": "Property not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Add the property to the customer's favorite list
+        customer.fav_properties.add(property)
+
+        return Response(
+            {"message": "Property added to favorites."},
+            status=status.HTTP_200_OK,
+        )
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# Remove a property from the customer's favorite list
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+def remove_favorite(request, property_id):
+    try:
+        # Check if the user is a customer
+        if not hasattr(request.user, "customer_profile"):
+            return Response(
+                {"error": "Only customers can remove favorites."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        customer = request.user.customer_profile  # Access the customer profile
+
+        # Get the property to remove from favorites
+        property = Property.objects.filter(pk=property_id).first()
+        if not property:
+            return Response(
+                {"error": "Property not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Remove the property from the customer's favorite list
+        customer.fav_properties.remove(property)
+
+        return Response(
+            {"message": "Property removed from favorites."},
+            status=status.HTTP_200_OK,
+        )
+
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

@@ -391,10 +391,15 @@ function Profile() {
                               to={`/property/${property.id}`}
                               key={property.id}
                             >
-                              <h4 className="font-medium">{property.name}</h4>
+                              <h4 className="font-medium mb-1">{property.title}</h4>
                             </Link>
-                            <p className="text-sm text-muted-foreground">
-                              {property.address}
+                            <p className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <MapPin size={20} />{" "}
+                              <span>
+                                {property.city}
+                                {", "}
+                                {property.state}
+                              </span>
                             </p>
                           </Card>
                         ))

@@ -1,5 +1,3 @@
-> **Name:** CHAUHAN KRISH YOGESHBHAI<br /> **Enroll No:** 22002171310015<br /> **Branch:** CST<br /> **Roll No:** 09<br />
-
 # Estate Master
 
 **Estate Master** is a real estate website that provides a platform for listing and managing properties. The frontend is built with **ReactJS** using **TailwindCSS** for styling, while the backend is powered by **Django Rest Framework (DRF)**, with **PostgreSQL** as the database.
@@ -36,8 +34,8 @@ Before you begin, ensure you have the following installed:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/estatemaster.git
-   cd estatemaster
+   git clone https://github.com/Krish4523/estate-master.git
+   cd estate-master
    ```
 
 2. Navigate to the `frontend` directory:

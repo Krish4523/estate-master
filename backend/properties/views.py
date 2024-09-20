@@ -79,7 +79,7 @@ def save_property_view(request):
         agent = get_object_or_404(Agent, user__id=property_data["agent"])
         agent.inquiry_listings.add(property_instance)
         agent.save()
-        seller = get_object_or_404(Customer, user__id=property_data["agent"])
+        seller = get_object_or_404(Customer, user__id=property_data["seller"])
         seller.own_properties.add(property_instance)
         seller.save()
 
@@ -93,6 +93,9 @@ def save_property_view(request):
     # If serializer is not valid, return errors
     print(serializer.errors)
     return Response(serializer.errors, status=400)
+
+
+
 
 
 @api_view(["GET"])

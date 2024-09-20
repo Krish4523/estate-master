@@ -22,12 +22,12 @@ class Property(models.Model):
     parking = models.IntegerField()
     listed_date = models.DateTimeField(auto_now_add=True)
 
-    latitude = models.DecimalField(
-        max_digits=9, decimal_places=6, null=True, blank=True
-    )
-    longitude = models.DecimalField(
-        max_digits=9, decimal_places=6, null=True, blank=True
-    )
+    # latitude = models.DecimalField(
+    #     max_digits=9, decimal_places=6, null=True, blank=True
+    # )
+    # longitude = models.DecimalField(
+    #     max_digits=9, decimal_places=6, null=True, blank=True
+    # )
 
     is_verified = models.BooleanField(default=False)
     is_sold = models.BooleanField(default=False)

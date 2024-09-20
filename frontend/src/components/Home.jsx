@@ -1,29 +1,41 @@
-import i1 from "@/assets/images/home1.jpeg";
+import i1 from "@/assets/images/image1.webp";
+import i2 from "@/assets/images/image2.jpg";
 import { Card } from "@/components/ui/card.jsx";
 import { Button } from "@/components/ui/button.jsx";
 import { Separator } from "@/components/ui/separator.jsx";
-import { Input } from "@/components/ui/input.jsx";
+import logo from "@/assets/estatemaster-logo-transparent.svg";
+import { Mail, Phone } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function Home() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-4 md:space-y-10">
+      <div className="block sm:hidden p-2">
+        <h4 className="text-2xl font-semibold">Welcome to EstateMaster</h4>
+      </div>
       {/* Welcome Section */}
-      <div className="relative p-4">
-        <img src={i1} alt="" className="w-full h-auto rounded-xl" />
-        <div className="absolute bottom-10 left-20 w-3/4 text-white">
-          <h4 className="text-2xl font-semibold">Welcome to PP</h4>
-          <p className="text-xl font-bold">
-            Discover Exceptional Properties with PP
+      <div className="relative p-2">
+        <img
+          src={i1}
+          alt=""
+          className="w-full h-auto md:h-[500px] object-cover rounded-xl"
+        />
+        <div className="absolute bottom-4 md:bottom-8 left-8 sm:right-16 sm:text-right text-white">
+          <h4 className="hidden sm:block text-2xl font-semibold">
+            Welcome to EstateMaster
+          </h4>
+          <p className="text-lg sm:text-xl font-bold">
+            Discover Exceptional Properties with EstateMaster
           </p>
         </div>
       </div>
 
       {/* Commitment Section */}
-      <div className="flex flex-col md:flex-row gap-8 p-4">
+      <div className="flex flex-col md:flex-row gap-8 p-2">
         <div className="flex-1">
-          <img src={i1} alt="" className="w-full h-auto rounded-xl" />
+          <img src={i2} alt="" className="w-full h-auto rounded-xl" />
         </div>
-        <div className="flex-1 flex flex-col justify-center space-y-6">
+        <div className="flex-1 flex flex-col items-start justify-center space-y-6">
           <p className="text-gray-500">Unveiling our Journey</p>
           <h2 className="text-3xl font-bold leading-snug">
             Our Commitment Crafting Extraordinary Real Estate Experiences
@@ -33,7 +45,7 @@ function Home() {
             explicabo eius fugiat laudantium alias quae, excepturi illum aperiam
             laboriosam quidem voluptates necessitatibus.
           </p>
-          <div className="flex justify-between items-center">
+          {/* <div className="flex justify-between items-center">
             {["10k+", "10k+", "10k+"].map((text, index) => (
               <div
                 key={index}
@@ -43,7 +55,7 @@ function Home() {
                 <p>Happy Clients</p>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -53,14 +65,14 @@ function Home() {
           <p className="text-lg font-bold">Your Future Home Awaits!</p>
           <h2 className="text-3xl font-bold">Find Your Dream Here</h2>
           <p className="text-sm mt-4">
-            <b>Showing 1-9</b> out of 3k properties
+            <b>Showing 1-6</b> out of all properties
           </p>
         </div>
         <div className="flex overflow-x-auto scrollbar-hide gap-4">
           {[...Array(6)].map((_, index) => (
             <Card
               key={index}
-              className="w-[240px] p-4 bg-white text-black rounded-xl"
+              className="min-w-[240px] p-4 bg-white text-black rounded-xl"
             >
               <img src={i1} alt="" className="w-full h-40 rounded-lg" />
               <div className="mt-4 space-y-2">
@@ -73,8 +85,8 @@ function Home() {
                 </div>
                 <div className="flex justify-between items-center mt-4">
                   <b>$3250.00</b>
-                  <Button size="sm">View Details</Button>
                 </div>
+                <Button size="sm">View Details</Button>
               </div>
             </Card>
           ))}
@@ -106,74 +118,59 @@ function Home() {
       </div>
 
       {/* Contact Section */}
-      <div className="bg-gray-900 p-8 rounded-xl text-white flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0">
+      {/* <div className="bg-gray-900 p-8 rounded-xl text-white flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0">
         <img src={i1} alt="" className="w-32 h-32 rounded-lg md:mr-8" />
         <img src={i1} alt="" className="w-32 h-32 rounded-lg" />
-      </div>
+      </div> */}
 
       {/* Footer Section */}
       <div className="bg-gray-100 p-8 rounded-xl space-y-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">
-            Explore real estate opportunities with us?
+          <h1 className="text-xl sm:text-3xl font-bold">
+            Explore real estate opportunities with us
           </h1>
           <p className="text-gray-600 mt-4">
-            Earum, quidem nihil eligendi voluptas laboriosam, nulla est
-            excepturi voluptate laborum debitis aut suscipit cupiditate.
+            Discover a world of possibilities with our expert guidance. Let us
+            help you find your dream property.
           </p>
         </div>
         <Separator />
-        <div className="flex flex-col gap-4 md:flex-row justify-around items-start space-y-8 md:space-y-0">
+        <div className="flex flex-col gap-4 md:flex-row justify-evenly items-start space-y-8 md:space-y-0">
           <div className="flex-1 space-y-4">
-            <h2 className="text-xl font-bold">PPortal</h2>
-            <p className="text-sm text-gray-600">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum
-              similique consectetur laboriosam explicabo iusto
-            </p>
-            <div className="flex gap-1">
-              <Input
-                type="text"
-                placeholder="Enter email"
-                className="flex-grow"
-              />
-              <Button variant="outline">Subscribe</Button>
-            </div>
-          </div>
-
-          <div className="flex-1 space-y-4">
-            <h2 className="text-xl font-bold">Learn More</h2>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li>About Us</li>
-              <li>Latest Items</li>
-              <li>Hot Offers</li>
-              <li>Popular</li>
-              <li>FAQ</li>
-              <li>Privacy Policy</li>
-            </ul>
+            <Link to="/">
+              <img src={logo} alt="logo" className="h-full w-40" />
+            </Link>
+            <p className="text-sm text-gray-600">Real Estate redefined</p>
           </div>
 
           <div className="flex-1 space-y-4">
             <h2 className="text-xl font-bold">Our Community</h2>
             <ul className="space-y-2 text-sm text-gray-600">
-              <li>About Us</li>
-              <li>Latest Items</li>
-              <li>Hot Offers</li>
+              <Link to="/listings">
+                <li>Listings</li>
+              </Link>
+              <Link to="/appointments">
+                <li>Appointments</li>
+              </Link>
+              <Link to="/add-property">
+                <li>Add Property</li>
+              </Link>
+              <Link to="/profile">
+                <li>Profile</li>
+              </Link>
             </ul>
           </div>
 
           <div className="flex-1 space-y-4">
             <h2 className="text-xl font-bold">Contact Us</h2>
             <ul className="space-y-2 text-sm text-gray-600">
-              <li>Contact Number: 123-456-7890</li>
-              <li>Email Address: exm@gmail.com</li>
+              <li className="flex items-center gap-2">
+                <Phone size={16} /> <spam>123-456-7890</spam>
+              </li>
+              <li className="flex items-center gap-2">
+                <Mail size={16} /> <spam>admin@admin.com</spam>
+              </li>
             </ul>
-            <div className="flex space-x-4 mt-4">
-              <span>I</span>
-              <span>T</span>
-              <span>Y</span>
-              <span>F</span>
-              <span>L</span>
-            </div>
           </div>
         </div>
       </div>

@@ -33,8 +33,6 @@ class PropertySerializer(serializers.ModelSerializer):
             "bedrooms",
             "parking",
             "sqft",
-            "latitude",
-            "longitude",
             "images",
             "is_verified",
             "is_sold",

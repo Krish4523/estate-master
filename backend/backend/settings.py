@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "accounts.apps.AccountsConfig",
     "properties.apps.PropertiesConfig",
-    "inquiries.apps.InquiriesConfig",
     "appointments.apps.AppointmentsConfig",
     "transactions.apps.TransactionsConfig",
 ]

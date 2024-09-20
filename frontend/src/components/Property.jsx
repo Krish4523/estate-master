@@ -17,7 +17,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-import { Bed, Car, Heart, Image, LandPlot, MapPin } from "lucide-react";
+import { Bed, Car, Heart, LandPlot, MapPin } from "lucide-react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
@@ -207,7 +207,6 @@ function Property() {
             {`${home.local_address}, ${home.city}, ${home.state}, ${home.pincode}`}
           </p>
         </div>
-
         <div>
           {user.role === "customer" && (
             <div className="flex justify-between space-x-4">
@@ -256,7 +255,10 @@ function Property() {
             <Button onClick={() => setShowDialog(true)}>Verify Property</Button>
           )}
         </div>
+      </div>
 
+      {/* Right side: Sidebar */}
+      <div className="lg:w-1/3 p-2 lg:p-6 lg:pe-0 rounded-lg space-y-6">
         {/* Conditional Agent Info for Customers */}
         {user.role === "customer" && agent && (
           <div className="bg-white shadow-lg p-4 rounded-lg">
@@ -285,10 +287,6 @@ function Property() {
             <p>{home.description}</p>
           </div>
         </div>
-      </div>
-
-      {/* Right side: Sidebar */}
-      <div className="lg:w-1/3 p-2 lg:p-6 lg:pe-0 rounded-lg space-y-6">
         <div>
           <h2 className="text-xl font-semibold">Details</h2>
           <div className="flex gap-2 sm:gap-8 lg:gap-2 mt-2 text-sm">
@@ -330,14 +328,6 @@ function Property() {
                 <p>No Nearby Places</p>
               )}
             </ol>
-          </div>
-        </div>
-
-        {/* Location */}
-        <div>
-          <h2 className="text-xl font-semibold">Location</h2>
-          <div className="bg-secondary p-4 min-h-96 md:h-auto rounded-md mt-2">
-            <Image className="w-full h-auto rounded-md" />
           </div>
         </div>
 

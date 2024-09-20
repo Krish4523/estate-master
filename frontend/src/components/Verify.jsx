@@ -8,7 +8,6 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp.jsx";
-import { Input } from "@/components/ui/input.jsx";
 
 function VerifyOtpPage() {
   const [otp, setOtp] = useState("");
@@ -80,11 +79,6 @@ function VerifyOtpPage() {
               <InputOTPSlot index={5} />
             </InputOTPGroup>
           </InputOTP>
-          {/* <Input
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            placeholder="Enter OTP..."
-          /> */}
 
           <Button type="submit" disabled={loading} className="w-full">
             {loading ? (

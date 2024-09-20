@@ -20,44 +20,6 @@ import { LoginSchema } from "@/utils/schemas.js";
 import { useAuth } from "@/contexts/AuthContext";
 
 function Login() {
-  /*const [errorMessage, setErrorMessage] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const form = useForm({
-    resolver: zodResolver(LoginSchema),
-    defaultValues: {
-      emailOrPhone: "",
-      password: "",
-    },
-  });
-
-  const navigate = useNavigate();
-
-  async function onSubmit(data) {
-    const isEmail = z.string().email().safeParse(data.emailOrPhone).success;
-
-    const formData = {
-      email: isEmail ? data.emailOrPhone : "",
-      phone: isEmail ? "" : data.emailOrPhone,
-      password: data.password,
-    };
-
-    await submitForm({
-      data: formData,
-      endpoint: `${import.meta.env.VITE_API_BASE_URL}/auth/login/`,
-      setLoading,
-      setErrorMessage,
-      onSuccess: (response) => {
-        console.log("Account created successfully:", response);
-        // Example for storing token in localStorage
-        localStorage.setItem("authToken", response?.token);
-        navigate("/");
-      },
-      onError: (error) => {
-        console.error("Error creating account:", error);
-      }
-    });
-  }*/
   const { login, loading, errorMessage } = useAuth();
   const form = useForm({
     resolver: zodResolver(LoginSchema),

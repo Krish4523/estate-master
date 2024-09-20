@@ -20,7 +20,7 @@ export const SignUpSchema = z
     phone: z
       .string()
       .length(10, { message: "Phone number must be of 10 digits." }),
-    // role: z.enum["customer", "agent"]
+    role: z.enum["customer", "agent"]
   })
   .refine((data) => data.password === data.confPassword, {
     path: ["confPassword"], // targeting the confPassword field for error message
@@ -61,9 +61,9 @@ export const PropertySchema = z.object({
   sqft: z.coerce.number().positive("Area must be a positive number"),
   bedrooms: z.coerce.number().positive("Bedrooms must be a positive number"),
   parking: z.coerce.number().min(0, "Parking spaces cannot be negative"),
-  latitude: z.coerce.number(),
-  longitude: z.coerce.number(),
-  images: z.array(z.instanceof(File)).min(4, "Please upload at least 4 images"),
+  images: z.array(z.instanceof(File))
+    .min(1, "Please upload at least 1 image")
+    .max(5, "Please upload at least 4 images"),
   agent: z.coerce.number().positive("Please select an agent"),
   nearby_places: z
     .array(

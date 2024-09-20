@@ -1,3 +1,5 @@
+> **Name:** CHAUHAN KRISH YOGESHBHAI<br /> **Enroll No:** 22002171310015<br /> **Branch:** CST<br /> **Roll No:** 09<br />
+
 # Estate Master
 
 **Estate Master** is a real estate website that provides a platform for listing and managing properties. The frontend is built with **ReactJS** using **TailwindCSS** for styling, while the backend is powered by **Django Rest Framework (DRF)**, with **PostgreSQL** as the database.
@@ -23,7 +25,7 @@
 
 Before you begin, ensure you have the following installed:
 
-- Node.js (version 14.x or later)
+- Node.js (LTS version)
 - Python (version 3.8 or later)
 - PostgreSQL (version 12.x or later)
 - npm or yarn (for frontend dependencies)
@@ -58,7 +60,6 @@ Before you begin, ensure you have the following installed:
    npm run dev
    ```
 
-
 5. Open [http://localhost:5173](http://localhost:5173) to view the project.
 
 ### Backend Setup (Django)
@@ -67,7 +68,7 @@ Before you begin, ensure you have the following installed:
 
    ```bash
    python3 -m venv venv
-   source venv/bin/activate
+   source venv/Scripts/activate
    ```
 
 2. Navigate to the `backend` directory:

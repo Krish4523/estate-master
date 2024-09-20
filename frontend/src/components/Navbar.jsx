@@ -23,8 +23,9 @@ const navItems = [
 
 function Navbar() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
+  console.log(user);
 
   return (
     <nav className="fixed top-0 w-full h-[60px] bg-white z-50 shadow-md py-2 px-2 md:px-6 lg:px-10 flex justify-between items-center">
@@ -78,9 +79,9 @@ function Navbar() {
               key={item}
               to={href}
               className={({ isActive }) =>
-                `text-lg hover:bg-secondary rounded-md transition-colors duration-200 ${
+                `text-lg hover:bg-secondary transition-colors duration-100 ${
                   isActive
-                    ? "text-primary px-3 py-2 rounded"
+                    ? "text-primary font-semibold border-b-2 border-primary px-3 py-2"
                     : "text-gray-400 hover:text-gray-700 px-3 py-2 rounded"
                 }`
               }
@@ -95,12 +96,15 @@ function Navbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="icon" className="rounded-full">
-                {/*<img
-                src={profileImage}
-                alt="Profile"
-                className="object-cover w-full h-full"
-              />*/}
-                <User />
+                {user.avatar ? (
+                  <img
+                    src={`${import.meta.env.VITE_API_BASE_URL}/${user.avatar}`}
+                    alt="Profile"
+                    className="object-cover w-full h-full rounded-full"
+                  />
+                ) : (
+                  <User />
+                )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

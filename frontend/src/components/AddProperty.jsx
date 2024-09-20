@@ -118,7 +118,7 @@ function AddProperty() {
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
-      <h1 className="text-2xl font-bold mb-4">Add Property</h1>
+      <h1 className="text-2xl font-bold mb-4 text-primary">Add Property</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {/* Title Field */}
@@ -248,32 +248,7 @@ function AddProperty() {
               </FormItem>
             )}
           />
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="latitude"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input type="number" placeholder="latitude" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="longitude"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input type="number" placeholder="longitude" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div> */}
+          
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* City Field */}

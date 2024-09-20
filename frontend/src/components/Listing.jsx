@@ -144,10 +144,18 @@ function Listing() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="1500000">1,500,000</SelectItem>
-                  <SelectItem value="2000000">2,000,000</SelectItem>
-                  <SelectItem value="3000000">3,000,000</SelectItem>
-                  <SelectItem value="4000000">4,000,000</SelectItem>
+                  <SelectItem value="1500000">
+                    upto {formatCurrency(1500000)}
+                  </SelectItem>
+                  <SelectItem value="2000000">
+                    upto {formatCurrency(2000000)}
+                  </SelectItem>
+                  <SelectItem value="4000000">
+                    upto {formatCurrency(4000000)}
+                  </SelectItem>
+                  <SelectItem value="6000000">
+                    upto {formatCurrency(6000000)}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -258,18 +266,6 @@ function Listing() {
           ))}
         </div>
       </div>
-
-      {/* Map Section */}
-      {/*<div className="flex-1 hidden md:block">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3672.885857770807!2d72.48585367436662!3d22.991224417499122!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e9bc4ce73bf61%3A0x323634959dab072f!2sLJ%20University!5e0!3m2!1sen!2sin!4v1711865697466!5m2!1sen!2sin"
-          width="100%"
-          height="450px"
-          className="w-full rounded-md"
-          allowFullScreen=""
-          loading="lazy"
-        ></iframe>
-      </div>*/}
     </div>
   );
 }

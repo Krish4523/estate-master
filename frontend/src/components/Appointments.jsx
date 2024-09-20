@@ -10,7 +10,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "./ui/button";
-import { Calendar, MessageSquareText, User } from "lucide-react";
+import {
+  Calendar,
+  CircleCheckBig,
+  MessageSquareText,
+  User,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -130,6 +135,8 @@ function Appointments() {
     }
   };
 
+  const isCompleted = (date) => date.getTime() >= new Date().getTime();
+
   return (
     <div className="flex flex-col items-center gap-4 p-4">
       <div className="w-full sm:w-9/12">
@@ -164,19 +171,31 @@ function Appointments() {
             </p>
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row gap-2">
-            <Button
-              className="w-full sm:w-fit"
-              onClick={() => handleEditClick(appointment)}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="destructive"
-              className="w-full sm:w-fit"
-              onClick={() => handleDeleteClick(appointment)}
-            >
-              Delete
-            </Button>
+            {isCompleted(new Date(appointment.date)) ? (
+              // <p className="text-sm text-white bg-purple-600 px-2 py-1 rounded-md">
+              //   Completed
+              // </p>
+              <p className="flex items-center gap-2">
+                <CircleCheckBig size={20} />
+                <span>Completed</span>
+              </p>
+            ) : (
+              <>
+                <Button
+                  className="w-full sm:w-fit"
+                  onClick={() => handleEditClick(appointment)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="w-full sm:w-fit"
+                  onClick={() => handleDeleteClick(appointment)}
+                >
+                  Delete
+                </Button>
+              </>
+            )}
           </CardFooter>
         </Card>
       ))}

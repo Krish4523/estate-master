@@ -17,7 +17,17 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-import { Bed, Car, Heart, LandPlot, MapPin } from "lucide-react";
+import {
+  Bed,
+  Car,
+  Factory,
+  Heart,
+  Home,
+  LandPlot,
+  MapPin,
+  ShoppingCart,
+  User,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
@@ -60,7 +70,6 @@ function Property() {
         );
         console.log(response.data);
         toast.success("Appointment booked successfully");
-        // Optionally refresh data to update `home.has_appointment`
         setHome((prevHome) => ({ ...prevHome, has_appointment: true }));
       } catch (error) {
         console.log(error);
@@ -263,11 +272,20 @@ function Property() {
         {user.role === "customer" && agent && (
           <div className="bg-white shadow-lg p-4 rounded-lg">
             <div className="flex items-center space-x-4">
-              <img
+              {/* <img
                 src={`${import.meta.env.VITE_API_BASE_URL}/${agent?.user.avatar}`}
                 alt="Agent"
                 className="w-12 h-12 rounded-full"
-              />
+              /> */}
+              {agent?.user.avatar ? (
+                <img
+                  src={`${import.meta.env.VITE_API_BASE_URL}/${agent?.user.avatar}`}
+                  alt="Profile"
+                  className="object-cover size-12 rounded-full"
+                />
+              ) : (
+                <User size={48} />
+              )}
               <div>
                 <p className="font-semibold">
                   {agent?.user.name || "Unknown Agent"}
@@ -302,6 +320,16 @@ function Property() {
               <Car size={20} />
               <span>{home.parking} parking</span>
             </div>
+            {home?.property_type && (
+              <div className="flex flex-wrap gap-1 bg-secondary p-2 rounded-md">
+                {home.property_type === "residential" && <Home size={20} />}
+                {home.property_type === "commercial" && (
+                  <ShoppingCart size={20} />
+                )}
+                {home.property_type === "industrial" && <Factory size={20} />}
+                <span>{`${home?.property_type[0].toUpperCase()}${home.property_type.slice(1)}`}</span>
+              </div>
+            )}
           </div>
         </div>
 

@@ -65,6 +65,7 @@ export const PropertySchema = z.object({
     .min(1, "Please upload at least 1 image")
     .max(5, "Please upload at least 4 images"),
   agent: z.coerce.number().positive("Please select an agent"),
+  document_name: z.string().optional(),
   nearby_places: z
     .array(
       z.object({

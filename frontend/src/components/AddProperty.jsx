@@ -37,6 +37,23 @@ function AddProperty() {
   const [agents, setAgents] = useState([]);
   const navigate = useNavigate();
 
+  // const defaultValues = {
+  //   title: "",
+  //   description: "",
+  //   property_type: "",
+  //   price: "",
+  //   local_address: "",
+  //   city: "",
+  //   state: "",
+  //   pincode: "",
+  //   sqft: "",
+  //   bedrooms: "",
+  //   parking: "",
+  //   agent: "",
+  //   images: [],
+  //   nearby_places: [{ name: "", distance: "", place_type: "" }],
+  // }
+
   const form = useForm({
     resolver: zodResolver(PropertySchema),
     defaultValues: {
@@ -53,7 +70,8 @@ function AddProperty() {
       parking: "",
       agent: "",
       images: [],
-      nearby_places: [{ name: "", distance: "", place_type: "" }], // Initial nearby place
+      nearby_places: [{ name: "", distance: "", place_type: "" }],
+      document_name: "",
     },
   });
 
@@ -248,7 +266,20 @@ function AddProperty() {
               </FormItem>
             )}
           />
-          
+          {user.role === "agent" && (
+            <FormField
+              control={form.control}
+              name="document_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="Document Name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* City Field */}

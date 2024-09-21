@@ -69,7 +69,7 @@ function Home() {
           alt=""
           className="w-full h-auto md:h-[500px] object-cover rounded-xl"
         />
-        <div className="absolute bottom-4 md:bottom-8 left-8 sm:right-20 sm:text-right">
+        <div className="absolute bottom-4 sm:top-40 md:bottom-8 left-8 sm:right-40 sm:text-center">
           <h4 className="hidden sm:block text-2xl font-semibold">
             Welcome to EstateMaster
           </h4>

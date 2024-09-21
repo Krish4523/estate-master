@@ -61,7 +61,7 @@ def save_property_view(request):
         # Handle image uploads
         images = request.FILES.getlist("images[]")
         if images:
-            for image in images[:4]:  # Limit to 4 images
+            for image in images[:4]:
                 PropertyImage.objects.create(property=property_instance, image=image)
 
         # Handle nearby places if provided
@@ -69,9 +69,9 @@ def save_property_view(request):
             for nearby_place in nearby_places_list:
                 NearbyPlace.objects.create(
                     property=property_instance,
-                    name=nearby_place["name"],  # Extract value from list
-                    distance=nearby_place["distance"],  # Extract value from list
-                    place_type=nearby_place["place_type"],  # Extract value from list
+                    name=nearby_place["name"],
+                    distance=nearby_place["distance"],
+                    place_type=nearby_place["place_type"],
                 )
 
         print(property_data["agent"])
@@ -79,9 +79,11 @@ def save_property_view(request):
         agent = get_object_or_404(Agent, user__id=property_data["agent"])
         agent.inquiry_listings.add(property_instance)
         agent.save()
-        seller = get_object_or_404(Customer, user__id=property_data["seller"])
-        seller.own_properties.add(property_instance)
-        seller.save()
+        user = User.objects.get(pk=property_data["seller"])
+        if user.role == "customer":
+            seller = get_object_or_404(Customer, user__id=property_data["seller"])
+            seller.own_properties.add(property_instance)
+            seller.save()
 
         return Response(
             {
@@ -93,9 +95,6 @@ def save_property_view(request):
     # If serializer is not valid, return errors
     print(serializer.errors)
     return Response(serializer.errors, status=400)
-
-
-
 
 
 @api_view(["GET"])

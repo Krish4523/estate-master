@@ -21,13 +21,7 @@ class Property(models.Model):
     bedrooms = models.IntegerField()
     parking = models.IntegerField()
     listed_date = models.DateTimeField(auto_now_add=True)
-
-    # latitude = models.DecimalField(
-    #     max_digits=9, decimal_places=6, null=True, blank=True
-    # )
-    # longitude = models.DecimalField(
-    #     max_digits=9, decimal_places=6, null=True, blank=True
-    # )
+    document_name = models.CharField(blank=True, null=True)
 
     is_verified = models.BooleanField(default=False)
     is_sold = models.BooleanField(default=False)
@@ -58,14 +52,6 @@ class PropertyImage(models.Model):
 
 
 class NearbyPlace(models.Model):
-    # PROPERTY_PLACE_TYPE_CHOICES = [
-    #     ("school", "School"),
-    #     ("hospital", "Hospital"),
-    #     ("mall", "Mall"),
-    #     ("park", "Park"),
-    #     # Add more place types if needed
-    # ]
-
     property = models.ForeignKey(
         Property, on_delete=models.CASCADE, related_name="nearby_places"
     )

@@ -69,7 +69,7 @@ function Home() {
           alt=""
           className="w-full h-auto md:h-[500px] object-cover rounded-xl"
         />
-        <div className="absolute bottom-4 md:bottom-8 left-8 sm:right-16 sm:text-right">
+        <div className="absolute bottom-4 md:bottom-8 left-8 sm:right-20 sm:text-right">
           <h4 className="hidden sm:block text-2xl font-semibold">
             Welcome to EstateMaster
           </h4>
@@ -87,7 +87,7 @@ function Home() {
         <div className="flex-1 flex flex-col items-start justify-center space-y-6">
           <p className="text-gray-500">Unveiling our Journey</p>
           <h2 className="text-3xl font-bold leading-snug">
-            Our Commitment Crafting Extraordinary Real Estate Experiences
+            Real Estate Experiences
           </h2>
           <p className="text-sm sm:text-base mt-6">
             Our clients are at the heart of everything we do. We strive to
@@ -225,10 +225,10 @@ function Home() {
             <h2 className="text-xl font-bold">Contact Us</h2>
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-center gap-2">
-                <Phone size={16} /> <spam>123-456-7890</spam>
+                <Phone size={16} /> <span>123-456-7890</span>
               </li>
               <li className="flex items-center gap-2">
-                <Mail size={16} /> <spam>admin@admin.com</spam>
+                <Mail size={16} /> <span>admin@admin.com</span>
               </li>
             </ul>
           </div>

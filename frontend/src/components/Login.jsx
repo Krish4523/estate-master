@@ -95,9 +95,6 @@ function Login() {
                     "Login"
                   )}
                 </Button>
-                <a href="#" className="text-center text-sm underline">
-                  Forgot your password?
-                </a>
               </div>
               <div className="mt-4 text-center text-sm">
                 Don&apos;t have an account?{" "}
